@@ -13,12 +13,9 @@ RUN npm ci
 # Copiar o restante do código fonte
 COPY . .
 
-# Copiar script de build personalizado
-COPY build-all.sh ./build-all.sh
-RUN chmod +x build-all.sh
-
-# Construir para produção com script personalizado
-RUN ./build-all.sh
+# Compilar diretamente sem script
+RUN npm run build
+RUN npx esbuild server/routes.ts server/storage.ts shared/schema.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/server
 RUN ls -la dist/
 RUN ls -la dist/public/
 RUN ls -la dist/server/ || echo "Não existe pasta server"
