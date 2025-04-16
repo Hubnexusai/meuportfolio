@@ -37,6 +37,14 @@ Você pode configurar estas variáveis no arquivo `.env` que já está pré-conf
 Para implantar a aplicação no Docker Swarm, utilize o script `deploy.sh`:
 
 ```bash
+git clone https://github.com/Hubnexusai/meuportfolio.git
+
+cd meuportfolio
+
+git pull
+
+chmod +x deploy.sh
+
 ./deploy.sh
 ```
 
