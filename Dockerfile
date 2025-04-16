@@ -1,31 +1,4 @@
-# Estágio de build
-FROM node:18-alpine AS builder
-
-# Diretório de trabalho
-WORKDIR /app
-
-# Copiar package.json e package-lock.json
-COPY package*.json ./
-
-# Instalar todas as dependências incluindo as de desenvolvimento
-RUN npm install
-
-# Copiar o restante do código fonte
-COPY . .
-
-# Verificar estrutura para debug
-RUN ls -la
-
-# Compilar o frontend com npx
-RUN npx vite build
-
-# Verificar a estrutura após o build
-RUN ls -la dist/
-
-# Compilar o backend com npx
-RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-
-# Estágio de produção
+# Imagem de produção direta - sem estágios de build
 FROM node:18-alpine
 
 # Configurações de ambiente
@@ -40,19 +13,15 @@ ENV DOMAIN=portfolio.hubnexusai.com
 # Diretório de trabalho
 WORKDIR /app
 
-# Copiar package.json e package-lock.json
-COPY package*.json ./
+# Copiar todo o código
+COPY . .
 
-# Instalar apenas dependências de produção
-RUN npm install --production
-
-# Copiar arquivos compilados do estágio de build
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/shared ./shared
-COPY --from=builder /app/server/vite.ts ./server/vite.ts
+# Instalar dependências e compilar o frontend
+RUN npm install
+RUN npm run build
 
 # Expor a porta padrão
 EXPOSE 5000
 
-# Iniciar a aplicação - usando node diretamente para evitar problemas com scripts npm
+# Iniciar o servidor diretamente
 CMD ["node", "dist/index.js"]
