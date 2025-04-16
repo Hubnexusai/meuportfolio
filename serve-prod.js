@@ -3,7 +3,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { registerRoutes } from './dist/routes.js';
+import { registerRoutes } from './dist/server/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
