@@ -713,8 +713,11 @@ const GlobalChatModal: React.FC = () => {
     })
     .then(response => {
       console.log('Webhook request enviado com sucesso:', response.status);
-      // Desativa o indicador de digitação após o envio
-      setIsTyping(false);
+      
+      // Mantém o indicador de digitação ativo por 5 segundos para dar feedback visual ao usuário
+      setTimeout(() => {
+        setIsTyping(false);
+      }, 5000);
     })
     .catch(error => {
       console.error('Erro ao enviar áudio para o webhook:', error);
@@ -776,8 +779,11 @@ const GlobalChatModal: React.FC = () => {
     })
     .then(response => {
       console.log('Webhook request enviado com sucesso:', response.status);
-      // Desativa o indicador de digitação após o envio
-      setIsTyping(false);
+      
+      // Mantém o indicador de digitação ativo por 5 segundos para dar feedback visual ao usuário
+      setTimeout(() => {
+        setIsTyping(false);
+      }, 5000);
     })
     .catch(error => {
       console.error('Erro ao enviar para o webhook:', error);
