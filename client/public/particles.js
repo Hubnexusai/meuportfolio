@@ -69,7 +69,7 @@ particlesJS('particles-js', {
     "events": {
       "onhover": {
         "enable": true,
-        "mode": ["grab", "connect"]
+        "mode": "connect"
       },
       "onclick": {
         "enable": true,
@@ -79,10 +79,10 @@ particlesJS('particles-js', {
     },
     "modes": {
       "connect": {
-        "distance": 250,
-        "radius": 150,
+        "distance": 300,
+        "radius": 180,
         "line_linked": {
-          "opacity": 0.8
+          "opacity": 0.6
         }
       },
       "grab": {

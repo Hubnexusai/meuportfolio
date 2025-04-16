@@ -85,12 +85,14 @@ const ButtonContainer = styled.div`
 `;
 
 const PrimaryButton = styled.a`
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  padding: 0.875rem 2rem;
+  padding: 0.875rem 3rem;
   background: linear-gradient(to right, #000935, #00CCFF);
   color: white;
-  border-radius: 0.5rem;
+  border-radius: 0.3rem;
   font-weight: 500;
   font-size: 1.125rem;
   transition: all 0.3s ease;
@@ -100,6 +102,7 @@ const PrimaryButton = styled.a`
   
   @media (min-width: 640px) {
     width: auto;
+    min-width: 220px;
   }
   
   &:hover {
@@ -184,7 +187,7 @@ const CTA: React.FC = () => {
             
             <ButtonContainer>
               <PrimaryButton href={`https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">
-                <FaWhatsapp style={{ marginRight: '8px' }} /> Fale Conosco
+                <FaWhatsapp style={{ marginRight: '10px', fontSize: '1.2rem' }} /> Fale Conosco
               </PrimaryButton>
             </ButtonContainer>
           </CTAContent>

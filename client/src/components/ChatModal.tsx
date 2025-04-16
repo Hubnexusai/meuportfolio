@@ -135,7 +135,7 @@ const ChatArea = styled.div`
   max-height: 50vh;
   background-image: 
     linear-gradient(rgba(22, 27, 58, 0.95), rgba(22, 27, 58, 0.95)),
-    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L70 30 L50 10 L30 30 Z' fill='%236b46c1' fill-opacity='0.05'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L70 30 L50 10 L30 30 Z' fill='%2300CCFF' fill-opacity='0.05'/%3E%3C/svg%3E");
 `;
 
 const bubbleZoomInBounce = keyframes`
@@ -193,7 +193,7 @@ const InputArea = styled.div`
   padding: 1rem;
   background: rgba(30, 41, 59, 0.7);
   gap: 0.75rem;
-  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  border-top: 1px solid rgba(0, 204, 255, 0.2);
 `;
 
 const ChatInput = styled.input`

@@ -42,8 +42,8 @@ const LogoIcon = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: 250px;
-  height: 100px;
+  width: 320px;
+  height: 120px;
   object-fit: contain;
   padding: 5px;
   border-radius: 5px;
@@ -73,20 +73,27 @@ const Header: React.FC = () => {
     <HeaderContainer>
       <HeaderContent>
         <LogoContainer>
-          {logoUrl ? (
-            // Se houver uma URL de logo definida, exibe a imagem
-            <LogoImage src={logoUrl} alt="Logo" />
-          ) : (
-            // Fallback: exibe o logo padrão se a variável de ambiente não estiver definida
-            <>
-              <LogoIcon>
-                <i className="fas fa-brain"></i>
-              </LogoIcon>
-              <LogoText>
-                Hub Nexus <span>AI</span>
-              </LogoText>
-            </>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {logoUrl ? (
+              // Se houver uma URL de logo definida, exibe a imagem
+              <>
+                <LogoImage src={logoUrl} alt="Logo" />
+                <LogoText style={{ marginLeft: '10px' }}>
+                  Hub Nexus <span>AI</span>
+                </LogoText>
+              </>
+            ) : (
+              // Fallback: exibe o logo padrão se a variável de ambiente não estiver definida
+              <>
+                <LogoIcon>
+                  <i className="fas fa-brain"></i>
+                </LogoIcon>
+                <LogoText>
+                  Hub Nexus <span>AI</span>
+                </LogoText>
+              </>
+            )}
+          </div>
         </LogoContainer>
       </HeaderContent>
     </HeaderContainer>

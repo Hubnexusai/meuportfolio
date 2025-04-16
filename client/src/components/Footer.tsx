@@ -46,8 +46,8 @@ const LogoIcon = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: 250px;
-  height: 100px;
+  width: 320px;
+  height: 120px;
   object-fit: contain;
   padding: 5px;
   border-radius: 5px;
@@ -182,15 +182,11 @@ const Footer: React.FC = () => {
               <SocialLink href="#" aria-label="Instagram">
                 <i className="fab fa-instagram"></i>
               </SocialLink>
-              <SocialLink href="#" aria-label="WhatsApp">
+              <SocialLink href={`https://wa.me/5581989224862`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="+5581989224862">
                 <i className="fab fa-whatsapp"></i>
               </SocialLink>
             </SocialLinks>
           </Copyright>
-          <BottomLinks>
-            <BottomLink href="#">Política de Privacidade</BottomLink>
-            <BottomLink href="#">Termos de Uso</BottomLink>
-          </BottomLinks>
         </BottomBar>
       </FooterContainer>
     </FooterSection>
