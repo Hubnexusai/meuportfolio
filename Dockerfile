@@ -53,5 +53,8 @@ RUN ls -la dist/public/ || echo "Não existe pasta public"
 # Expor a porta padrão
 EXPOSE 5000
 
-# Iniciar o servidor
-CMD ["node", "dist/index.js"]
+# Copiar o script de produção
+COPY --from=builder /app/serve-prod.js ./serve-prod.js
+
+# Iniciar o servidor com o script de produção
+CMD ["node", "serve-prod.js"]
