@@ -342,9 +342,8 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, agentName, agent
       body: JSON.stringify(webhookPayload),
     })
     .then(response => {
-      console.log('Webhook response:', response.status);
-      // Não processa a resposta internamente, deixa que o webhook 
-      // processe e responda como necessário. Não simula nenhuma resposta.
+      console.log('Webhook request enviado com sucesso:', response.status);
+      // Não processamos a resposta - o webhook não deve responder
     })
     .catch(error => {
       console.error('Erro ao enviar para o webhook:', error);
