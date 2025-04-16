@@ -632,12 +632,16 @@ const GlobalChatModal: React.FC = () => {
     discardRecording
   } = useAudioRecorder();
   
+  // Estado para controlar se já exibimos mensagem inicial
+  const [welcomeMessageShown, setWelcomeMessageShown] = useState(false);
+  
   // Reseta as mensagens quando o modal é aberto
   useEffect(() => {
     if (isOpen && agentName) {
       // Limpa as mensagens anteriores
       setMessages([]);
       messageIdCounter.current = 1;
+      setWelcomeMessageShown(false);
       
       // Adiciona uma única mensagem de boas-vindas
       const welcomeMessage: Message = {
@@ -650,6 +654,7 @@ const GlobalChatModal: React.FC = () => {
       };
       
       setMessages([welcomeMessage]);
+      setWelcomeMessageShown(true);
       
       // Iniciar enviando uma mensagem automática para o webhook apenas para notificar abertura
       const webhookPayload = {
@@ -670,13 +675,13 @@ const GlobalChatModal: React.FC = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Abertura de chat - resposta:', data);
-        // Não exibimos a resposta do webhook na abertura inicial
+        // Não fazemos nada com a resposta de abertura
       })
       .catch(error => {
         console.error('Erro ao notificar abertura de chat:', error);
       });
     }
-  }, [isOpen, agentName, webhookUrl]);
+  }, [isOpen, agentName]);
   
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -771,9 +776,9 @@ const GlobalChatModal: React.FC = () => {
         // Formato antigo - mensagem única
         let responseText = data && (data.messages || data.message);
         
-        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+        // Ignora completamente respostas "Workflow was started" para evitar duplicações
         if (responseText === "Workflow was started") {
-          responseText = `Olá, você está no ${agentName}.`;
+          responseText = null; // Define como null para não processar essa mensagem
         }
         
         if (responseText) {
@@ -880,9 +885,9 @@ const GlobalChatModal: React.FC = () => {
         // Formato antigo - mensagem única
         let responseText = data && (data.messages || data.message);
         
-        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+        // Ignora completamente respostas "Workflow was started" para evitar duplicações
         if (responseText === "Workflow was started") {
-          responseText = `Olá, você está no ${agentName}.`;
+          responseText = null; // Define como null para não processar essa mensagem
         }
         
         if (responseText) {
