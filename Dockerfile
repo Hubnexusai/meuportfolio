@@ -13,9 +13,12 @@ RUN npm ci
 # Copiar o restante do código fonte
 COPY . .
 
-# Compilar diretamente sem script
+# Compilar com vite e verificar conteúdo
 RUN npm run build
+RUN mkdir -p dist/server
 RUN npx esbuild server/routes.ts server/storage.ts shared/schema.ts --platform=node --packages=external --bundle --format=esm --outdir=dist/server
+# Verificar se os arquivos foram gerados corretamente
+RUN cat dist/server/routes.js > /dev/null 2>&1 || echo "ERRO: routes.js não foi gerado corretamente"
 RUN ls -la dist/
 RUN ls -la dist/public/
 RUN ls -la dist/server/ || echo "Não existe pasta server"
@@ -55,8 +58,8 @@ RUN ls -la dist/public/ || echo "Não existe pasta public"
 # Expor a porta padrão
 EXPOSE 5000
 
-# Copiar o script de produção
-COPY --from=builder /app/serve-prod.js ./serve-prod.js
+# Copiar o wrapper simplificado para produção
+COPY --from=builder /app/wrapper.js ./wrapper.js
 
-# Iniciar o servidor com o script de produção
-CMD ["node", "serve-prod.js"]
+# Iniciar o servidor com o wrapper simplificado
+CMD ["node", "wrapper.js"]
