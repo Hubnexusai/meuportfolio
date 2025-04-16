@@ -1,105 +1,168 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-// Container estilizado para o player de áudio
-const AudioContainer = styled.div`
-  min-width: 250px;
+// Componentes estilizados
+const PlayerContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 100%;
+`;
+
+const PlayButton = styled.button`
+  background: none;
+  border: none;
+  outline: none;
+  color: #00CCFF;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  padding: 0;
+  transition: all 0.2s ease;
   
-  .audio-player {
-    width: 100%;
-    height: 40px;
-    margin-bottom: 6px;
-    border-radius: 20px;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  &:hover {
+    transform: scale(1.1);
   }
-  
-  .audio-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
-    width: 100%;
-    padding: 0 5px;
-  }
-  
-  .audio-left {
-    display: flex;
-    align-items: center;
-  }
-  
-  .audio-icon {
-    margin-right: 6px;
-  }
-  
-  .audio-duration {
-    font-weight: 500;
-  }
+`;
+
+const ProgressBarContainer = styled.div`
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+`;
+
+const Progress = styled.div<{ $width: string }>`
+  height: 100%;
+  background: linear-gradient(to right, #000935, #00CCFF);
+  border-radius: 2px;
+  width: ${props => props.$width};
+  transition: width 0.1s linear;
+`;
+
+const TimeDisplay = styled.span`
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 35px;
 `;
 
 interface AudioPlayerProps {
   src: string;
-  duration?: string; // Opcional, para exibir a duração do áudio gravado
+  duration?: string;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration }) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [audioDuration, setAudioDuration] = useState<string>(duration || '00:00');
+const formatTime = (timeInSeconds: number): string => {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = Math.floor(timeInSeconds % 60);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+};
+
+// Parse a duração no formato "mm:ss" para segundos
+const parseDuration = (duration: string): number => {
+  const parts = duration.split(':');
+  if (parts.length === 2) {
+    const minutes = parseInt(parts[0], 10);
+    const seconds = parseInt(parts[1], 10);
+    return minutes * 60 + seconds;
+  }
+  return 0;
+};
+
+const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [durationInSeconds, setDurationInSeconds] = useState(parseDuration(duration));
   
-  // Função para formatar a duração do áudio
-  const formatAudioDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Criar elemento de áudio
+    const audio = new Audio(src);
+    audioRef.current = audio;
+    
+    // Event listeners
+    audio.addEventListener('loadedmetadata', () => {
+      setDurationInSeconds(audio.duration || parseDuration(duration));
+    });
+    
+    audio.addEventListener('timeupdate', () => {
+      setCurrentTime(audio.currentTime);
+    });
+    
+    audio.addEventListener('ended', () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    });
+    
+    // Cleanup na desmontagem do componente
+    return () => {
+      audio.pause();
+      audio.src = '';
+      
+      audio.removeEventListener('loadedmetadata', () => {});
+      audio.removeEventListener('timeupdate', () => {});
+      audio.removeEventListener('ended', () => {});
+    };
+  }, [src, duration]);
+  
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error('Erro ao reproduzir áudio:', error);
+      });
+    }
+    
+    setIsPlaying(!isPlaying);
   };
   
-  // Atualiza a duração quando um áudio é carregado
-  useEffect(() => {
-    if (audioRef.current) {
-      const handleLoadedMetadata = () => {
-        if (audioRef.current) {
-          setAudioDuration(formatAudioDuration(audioRef.current.duration));
-        }
-      };
-      
-      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-      
-      // Se já estiver carregado, atualize agora
-      if (audioRef.current.readyState >= 2) {
-        handleLoadedMetadata();
-      }
-      
-      return () => {
-        if (audioRef.current) {
-          audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        }
-      };
-    }
-  }, [src]);
+  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !progressBarRef.current) return;
+    
+    const progressBar = progressBarRef.current;
+    const rect = progressBar.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const width = rect.width;
+    
+    const percentage = offsetX / width;
+    const newTime = percentage * durationInSeconds;
+    
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+  
+  // Calcula a porcentagem de progresso
+  const progressPercentage = durationInSeconds > 0 
+    ? `${(currentTime / durationInSeconds) * 100}%` 
+    : '0%';
   
   return (
-    <AudioContainer>
-      <audio 
-        ref={audioRef}
-        controls 
-        src={src} 
-        className="audio-player"
+    <PlayerContainer>
+      <PlayButton onClick={togglePlayPause}>
+        <i className={isPlaying ? 'fas fa-pause' : 'fas fa-play'}></i>
+      </PlayButton>
+      
+      <ProgressBarContainer 
+        ref={progressBarRef}
+        onClick={handleProgressBarClick}
       >
-        Seu navegador não suporta o elemento de áudio.
-      </audio>
-      <div className="audio-info">
-        <div className="audio-left">
-          <span className="audio-icon">
-            <i className="fas fa-microphone"></i>
-          </span>
-          <span>Áudio</span>
-        </div>
-        <span className="audio-duration">{audioDuration}</span>
-      </div>
-    </AudioContainer>
+        <Progress $width={progressPercentage} />
+      </ProgressBarContainer>
+      
+      <TimeDisplay>
+        {formatTime(currentTime)} / {formatTime(durationInSeconds)}
+      </TimeDisplay>
+    </PlayerContainer>
   );
 };
 
