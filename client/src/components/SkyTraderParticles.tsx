@@ -9,14 +9,15 @@ const BRAND_COLORS = {
 };
 
 const ParticlesContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background-color: #0f172a;
-  overflow: hidden;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0 !important;
+  background-color: #0f172a !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
 `;
 
 // Configuração para o particles.js
@@ -82,7 +83,7 @@ const PARTICLES_CONFIG = {
     }
   },
   interactivity: {
-    detect_on: "canvas",
+    detect_on: "window",
     events: {
       onhover: {
         enable: true,
