@@ -13,10 +13,15 @@ RUN npm ci
 # Copiar o restante do código fonte
 COPY . .
 
-# Compilar o frontend com Vite
-RUN npm run build
+# Copiar script de build personalizado
+COPY build-all.sh ./build-all.sh
+RUN chmod +x build-all.sh
+
+# Construir para produção com script personalizado
+RUN ./build-all.sh
 RUN ls -la dist/
 RUN ls -la dist/public/
+RUN ls -la dist/server/ || echo "Não existe pasta server"
 
 # Estágio de produção
 FROM node:18-alpine
