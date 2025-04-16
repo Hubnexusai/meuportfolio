@@ -8,6 +8,7 @@ import CTA from '../components/CTA';
 import Footer from '../components/Footer';
 import NeuralBackground from '../components/NeuralBackground';
 import FloatingParticles from '../components/FloatingParticles';
+import SkyParticles from '../components/SkyParticles';
 
 const HomeContainer = styled.div`
   min-height: 100vh;
