@@ -653,7 +653,26 @@ const GlobalChatModal: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(webhookPayload),
-      }).catch(error => {
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Abertura de chat - resposta:', data);
+        
+        // Verifica se há uma mensagem inicial do webhook
+        if (data && data.messages) {
+          const welcomeMessage: Message = {
+            id: messageIdCounter.current++,
+            text: data.messages,
+            isUser: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            createdAt: Date.now(),
+            type: 'text'
+          };
+          
+          setMessages(prev => [...prev, welcomeMessage]);
+        }
+      })
+      .catch(error => {
         console.error('Erro ao notificar abertura de chat:', error);
       });
     }

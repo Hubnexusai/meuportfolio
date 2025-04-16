@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
-import UpdatedChatModal from "./components/UpdatedChatModal";
+import GlobalChatModal from "./components/GlobalChatModal";
 
 function Router() {
   return (
@@ -19,7 +19,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router />
-      <UpdatedChatModal />
+      <GlobalChatModal />
       <Toaster />
     </QueryClientProvider>
   );
