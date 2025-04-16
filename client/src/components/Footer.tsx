@@ -164,16 +164,37 @@ const Footer: React.FC = () => {
           <Copyright>
             <span>© {currentYear} Hub Nexus AI. Todos os direitos reservados.</span>
             <SocialLinks>
-              <SocialLink href="#" aria-label="Twitter">
-                <i className="fab fa-twitter"></i>
-              </SocialLink>
-              <SocialLink href="#" aria-label="Linkedin">
+              <SocialLink 
+                href="https://www.linkedin.com/in/gustavo-pedrosa-117b8716b/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Linkedin"
+              >
                 <i className="fab fa-linkedin"></i>
               </SocialLink>
-              <SocialLink href="#" aria-label="Instagram">
+              <SocialLink 
+                href="https://www.instagram.com/hubnexusai/?next=%2F" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Instagram"
+              >
                 <i className="fab fa-instagram"></i>
               </SocialLink>
-              <SocialLink href={`https://wa.me/5581989224862`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="+5581989224862">
+              <SocialLink 
+                href="https://www.facebook.com/profile.php?id=61573689647300" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Facebook"
+              >
+                <i className="fab fa-facebook"></i>
+              </SocialLink>
+              <SocialLink 
+                href={`https://wa.me/5581989224862`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="WhatsApp" 
+                title="+5581989224862"
+              >
                 <i className="fab fa-whatsapp"></i>
               </SocialLink>
             </SocialLinks>
