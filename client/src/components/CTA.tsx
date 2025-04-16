@@ -25,8 +25,8 @@ const CTACard = styled.div`
   border-radius: 1rem;
   overflow: hidden;
   padding: 2rem;
-  background: linear-gradient(to bottom right, #1e3a8a, #1a2151);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: linear-gradient(to bottom right, #000935, #0f172a);
+  border: 1px solid rgba(0, 204, 255, 0.3);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
   
@@ -87,7 +87,7 @@ const PrimaryButton = styled.a`
   display: inline-block;
   width: 100%;
   padding: 0.875rem 2rem;
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   color: white;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -112,7 +112,7 @@ const PrimaryButton = styled.a`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(transparent, rgba(139, 92, 246, 0.1), transparent);
+    background: linear-gradient(transparent, rgba(0, 204, 255, 0.1), transparent);
     opacity: 0;
     transform: rotate(30deg);
     transition: opacity 0.3s ease;
@@ -155,7 +155,7 @@ const GridPattern = () => (
     <defs>
       <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
         <rect width="100%" height="100%" fill="none" />
-        <circle cx="20" cy="20" r="1" fill="#8b5cf6" />
+        <circle cx="20" cy="20" r="1" fill="#00CCFF" />
       </pattern>
     </defs>
     <rect width="100%" height="100%" fill="url(#grid-pattern)" />

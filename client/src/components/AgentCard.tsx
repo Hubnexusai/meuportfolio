@@ -88,7 +88,7 @@ const ButtonContainer = styled.div`
 const Button = styled.a`
   display: inline-block;
   padding: 0.625rem 1.5rem;
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   color: white;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -110,7 +110,7 @@ const Button = styled.a`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(transparent, rgba(139, 92, 246, 0.1), transparent);
+    background: linear-gradient(transparent, rgba(0, 204, 255, 0.1), transparent);
     opacity: 0;
     transform: rotate(30deg);
     transition: opacity 0.3s ease;

@@ -146,8 +146,8 @@ const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(to right, #1e3a8a, #1a2151);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  background: linear-gradient(to right, #000935, #0f172a);
+  border-bottom: 1px solid rgba(0, 204, 255, 0.3);
 `;
 
 const AgentAvatar = styled.div`
