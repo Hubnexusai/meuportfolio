@@ -41,7 +41,7 @@ const SectionTitle = styled.h2`
 const Divider = styled.div`
   height: 0.25rem;
   width: 6rem;
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   margin: 0 auto 1.5rem;
 `;
 
