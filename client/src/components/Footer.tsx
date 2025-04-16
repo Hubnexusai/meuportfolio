@@ -76,34 +76,25 @@ const BottomBar = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  @media (min-width: 640px) {
-    flex-direction: row;
-    justify-content: space-between;
-  }
+  justify-content: center;
+  text-align: center;
 `;
 
 const Copyright = styled.div`
   color: #6b7280;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  flex-wrap: wrap;
   justify-content: center;
-
-  @media (min-width: 640px) {
-    justify-content: flex-start;
-  }
+  text-align: center;
 `;
 
 const SocialLinks = styled.div`
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-
-  @media (min-width: 640px) {
-    margin-top: 0;
-  }
+  justify-content: center;
 `;
 
 const SocialLink = styled.a`
