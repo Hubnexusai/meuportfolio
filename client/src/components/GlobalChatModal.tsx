@@ -139,7 +139,7 @@ const ModalContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(0, 204, 255, 0.3);
 `;
 
 const ModalHeader = styled.div`
@@ -219,7 +219,7 @@ const ChatArea = styled.div`
   max-height: 50vh;
   background-image: 
     linear-gradient(rgba(22, 27, 58, 0.95), rgba(22, 27, 58, 0.95)),
-    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L70 30 L50 10 L30 30 Z' fill='%236b46c1' fill-opacity='0.05'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L70 30 L50 10 L30 30 Z' fill='%2300CCFF' fill-opacity='0.05'/%3E%3C/svg%3E");
 `;
 
 const MessageWrapper = styled.div<{ $isUser: boolean }>`
@@ -266,13 +266,13 @@ const InputArea = styled.div`
   padding: 1rem;
   background: rgba(30, 41, 59, 0.7);
   gap: 0.75rem;
-  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  border-top: 1px solid rgba(0, 204, 255, 0.2);
 `;
 
 const ChatInput = styled.input`
   flex: 1;
   background: rgba(45, 55, 72, 0.7);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(0, 204, 255, 0.3);
   border-radius: 1.5rem;
   padding: 0.75rem 1.25rem;
   color: white;
@@ -280,7 +280,7 @@ const ChatInput = styled.input`
   outline: none;
   
   &:focus {
-    border-color: rgba(139, 92, 246, 0.6);
+    border-color: rgba(0, 204, 255, 0.6);
   }
   
   &::placeholder {
@@ -336,7 +336,7 @@ const RecordingTime = styled.div`
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 1rem;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(0, 204, 255, 0.3);
   display: flex;
   align-items: center;
   gap: 0.5rem;
