@@ -25,6 +25,7 @@ const Home: React.FC = () => {
     <HomeContainer>
       <NeuralBackground />
       <FloatingParticles />
+      <SkyParticles />
       <Header />
       <Hero />
       <AgentGrid />
