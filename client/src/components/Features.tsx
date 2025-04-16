@@ -41,7 +41,7 @@ const SectionTitle = styled.h2`
 const Divider = styled.div`
   height: 0.25rem;
   width: 6rem;
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   margin: 0 auto 1.5rem;
 `;
 
@@ -69,16 +69,16 @@ const FeatureCard = styled.div`
   text-align: center;
   padding: 1.5rem;
   border-radius: 0.75rem;
-  background: rgba(30, 58, 138, 0.5);
+  background: rgba(0, 9, 53, 0.5);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(0, 204, 255, 0.2);
 `;
 
 const IconContainer = styled.div`
   width: 4rem;
   height: 4rem;
   margin: 0 auto 1.5rem;
-  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(37, 99, 235, 0.2));
+  background: linear-gradient(to bottom right, rgba(0, 204, 255, 0.2), rgba(255, 255, 255, 0.2));
   border-radius: 0.75rem;
   display: flex;
   align-items: center;
@@ -87,7 +87,7 @@ const IconContainer = styled.div`
 
 const Icon = styled.i`
   font-size: 1.875rem;
-  color: #c4b5fd;
+  color: #00CCFF;
 `;
 
 const FeatureTitle = styled.h3`

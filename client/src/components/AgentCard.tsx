@@ -14,8 +14,8 @@ const Card = styled.div`
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4px);
   padding: 1.5rem;
-  background: rgba(22, 27, 58, 0.7);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: rgba(0, 9, 53, 0.7);
+  border: 1px solid rgba(0, 204, 255, 0.2);
   position: relative;
   z-index: 2;
   transition: all 0.4s ease;
@@ -30,7 +30,7 @@ const Card = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(130deg, rgba(139, 92, 246, 0.15), transparent 80%);
+    background: linear-gradient(130deg, rgba(0, 204, 255, 0.15), transparent 80%);
     z-index: -1;
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -38,8 +38,8 @@ const Card = styled.div`
   
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 35px rgba(107, 70, 193, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 204, 255, 0.2);
+    border-color: rgba(0, 204, 255, 0.4);
   }
   
   &:hover:before {
@@ -49,7 +49,7 @@ const Card = styled.div`
 
 const IconContainer = styled.div`
   margin-bottom: 1.5rem;
-  background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(37, 99, 235, 0.2));
+  background: linear-gradient(to bottom right, rgba(0, 204, 255, 0.2), rgba(255, 255, 255, 0.2));
   width: 4rem;
   height: 4rem;
   border-radius: 0.75rem;
@@ -60,7 +60,7 @@ const IconContainer = styled.div`
 
 const Icon = styled.div`
   font-size: 2rem;
-  color: #c4b5fd;
+  color: #00CCFF;
   transition: transform 0.4s ease;
   
   ${Card}:hover & {
