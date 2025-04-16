@@ -13,8 +13,14 @@ RUN npm install
 # Copiar o restante do código fonte
 COPY . .
 
+# Verificar estrutura para debug
+RUN ls -la
+
 # Compilar o frontend com npx
 RUN npx vite build
+
+# Verificar a estrutura após o build
+RUN ls -la dist/
 
 # Compilar o backend com npx
 RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
@@ -42,7 +48,6 @@ RUN npm install --production
 
 # Copiar arquivos compilados do estágio de build
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/client/dist ./client/dist
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/server/vite.ts ./server/vite.ts
 
