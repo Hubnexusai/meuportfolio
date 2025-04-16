@@ -3,8 +3,8 @@
 # Script para facilitar o deploy da aplicação no Docker Swarm
 
 # Carregar variáveis de ambiente
-if [ -f .env.production ]; then
-  export $(cat .env.production | grep -v '^#' | xargs)
+if [ -f .env ]; then
+  export $(cat .env | grep -v '^#' | xargs)
 fi
 
 # Construir a imagem

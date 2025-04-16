@@ -30,7 +30,7 @@ As principais configurações podem ser alteradas via variáveis de ambiente:
 | `DOCKER_REGISTRY` | Registry Docker para armazenar a imagem | hub-nexus |
 | `TAG` | Tag da imagem Docker | latest |
 
-Você pode configurar estas variáveis no arquivo `.env.production`.
+Você pode configurar estas variáveis no arquivo `.env` que já está pré-configurado.
 
 ### Deploy no Docker Swarm
 
@@ -57,7 +57,7 @@ docker stack deploy -c docker-compose.yml portfolio
 - `shared/`: Tipos e esquemas compartilhados
 - `docker-compose.yml`: Configuração para Docker Swarm
 - `Dockerfile`: Instruções para construção da imagem Docker
-- `.env.production`: Variáveis de ambiente para produção
+- `.env`: Variáveis de ambiente já pré-configuradas
 
 ## Customização
 
