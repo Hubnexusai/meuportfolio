@@ -90,9 +90,9 @@ function initParticles() {
         this.directionY = -this.directionY;
       }
       
-      // Move particle
-      this.x += this.directionX;
-      this.y += this.directionY;
+      // Move particle with doubled speed
+      this.x += this.directionX * 2;
+      this.y += this.directionY * 2;
       
       // Draw particle
       this.draw();
