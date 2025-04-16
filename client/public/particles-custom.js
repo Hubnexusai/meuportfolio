@@ -32,7 +32,7 @@ function initParticles() {
   
   // Particles properties
   const particles = [];
-  const particleCount = 70; // Número reduzido de partículas
+  const particleCount = 40; // Número muito reduzido de partículas
   const maxDistance = 180; // Max distance to draw connections
   
   // Mouse position
@@ -146,8 +146,8 @@ function initParticles() {
       const size = Math.random() * 2 + 1;
       const x = (Math.random() * ((canvas.width - size * 2) - (size * 2)) + size * 2);
       const y = (Math.random() * ((canvas.height - size * 2) - (size * 2)) + size * 2);
-      const directionX = (Math.random() * 1.0) - 0.5; // Velocidade aumentada
-      const directionY = (Math.random() * 1.0) - 0.5; // Velocidade aumentada
+      const directionX = (Math.random() * 2.0) - 1.0; // Velocidade muito aumentada
+      const directionY = (Math.random() * 2.0) - 1.0; // Velocidade muito aumentada
       const color = primaryColor;
       
       particles.push(new Particle(x, y, directionX, directionY, size, color));
