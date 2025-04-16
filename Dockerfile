@@ -39,7 +39,6 @@ RUN npm ci --only=production
 
 # Copiar arquivos compilados do estágio de build
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/client/dist ./client/dist
 
 # Expor a porta padrão
 EXPOSE 5000
