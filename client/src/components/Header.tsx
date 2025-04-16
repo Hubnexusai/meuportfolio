@@ -83,7 +83,7 @@ const Header: React.FC = () => {
                 <i className="fas fa-brain"></i>
               </LogoIcon>
               <LogoText>
-                Nexus<span>AI</span>
+                Hub Nexus <span>AI</span>
               </LogoText>
             </>
           )}

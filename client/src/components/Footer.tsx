@@ -159,7 +159,7 @@ const Footer: React.FC = () => {
                 <i className="fas fa-brain"></i>
               </LogoIcon>
               <LogoText>
-                Nexus<span>AI</span>
+                Hub Nexus <span>AI</span>
               </LogoText>
             </>
           )}
@@ -171,7 +171,7 @@ const Footer: React.FC = () => {
 
         <BottomBar>
           <Copyright>
-            <span>© {currentYear} NexusAI. Todos os direitos reservados.</span>
+            <span>© {currentYear} Hub Nexus AI. Todos os direitos reservados.</span>
             <SocialLinks>
               <SocialLink href="#" aria-label="Twitter">
                 <i className="fab fa-twitter"></i>
