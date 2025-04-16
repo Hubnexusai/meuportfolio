@@ -659,7 +659,12 @@ const GlobalChatModal: React.FC = () => {
         console.log('Abertura de chat - resposta:', data);
         
         // Verifica se há uma mensagem inicial do webhook (nos formatos "messages" ou "message")
-        const responseText = data && (data.messages || data.message);
+        let responseText = data && (data.messages || data.message);
+        
+        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+        if (responseText === "Workflow was started") {
+          responseText = `Olá, você está no ${agentName}.`;
+        }
         
         if (responseText) {
           const welcomeMessage: Message = {
@@ -737,7 +742,12 @@ const GlobalChatModal: React.FC = () => {
       console.log('Webhook response data (áudio):', data);
       
       // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
-      const responseText = data && (data.messages || data.message);
+      let responseText = data && (data.messages || data.message);
+      
+      // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+      if (responseText === "Workflow was started") {
+        responseText = `Olá, você está no ${agentName}.`;
+      }
       
       if (responseText) {
         // Adiciona a mensagem do agente vinda do webhook
@@ -822,7 +832,12 @@ const GlobalChatModal: React.FC = () => {
       console.log('Webhook response data (texto):', data);
       
       // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
-      const responseText = data && (data.messages || data.message);
+      let responseText = data && (data.messages || data.message);
+      
+      // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+      if (responseText === "Workflow was started") {
+        responseText = `Olá, você está no ${agentName}.`;
+      }
       
       if (responseText) {
         // Adiciona a mensagem do agente vinda do webhook
