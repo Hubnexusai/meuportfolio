@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import GlobalChatModal from "./components/GlobalChatModal";
-import ParticlesBackground from "./components/ParticlesBackground";
+import StarryBackground from "./components/StarryBackground";
 
 function Router() {
   return (
@@ -19,7 +19,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ParticlesBackground />
+      <StarryBackground />
       <Router />
       <GlobalChatModal />
       <Toaster />
