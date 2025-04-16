@@ -392,6 +392,62 @@ interface Message {
   type?: 'audio' | 'image' | 'document' | 'video' | 'text';
 }
 
+// Função auxiliar para processar respostas do webhook em vários formatos
+function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObject<number>): Message[] {
+  const messages: Message[] = [];
+  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+  // Caso 1: Resposta é um array com estrutura aninhada [{ output: [{ message, typeMessage }] }]
+  if (Array.isArray(data)) {
+    data.forEach(outerItem => {
+      // Verifica o formato com output aninhado
+      if (outerItem.output && Array.isArray(outerItem.output)) {
+        outerItem.output.forEach(item => {
+          if (item.message && item.message !== "Workflow was started") {
+            const messageType = item.typeMessage?.toLowerCase() || 'text';
+            messages.push({
+              id: messageIdCounter.current++,
+              text: item.message,
+              isUser: false,
+              time: currentTime,
+              createdAt: Date.now(),
+              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+            });
+          }
+        });
+      } 
+      // Formato alternativo: array de mensagens diretas [{ message, typeMessage }]
+      else if (outerItem.message && outerItem.message !== "Workflow was started") {
+        const messageType = outerItem.typeMessage?.toLowerCase() || 'text';
+        messages.push({
+          id: messageIdCounter.current++,
+          text: outerItem.message,
+          isUser: false,
+          time: currentTime,
+          createdAt: Date.now(),
+          type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+        });
+      }
+    });
+  } 
+  // Caso 2: Resposta é um objeto com message ou messages
+  else if (data) {
+    const responseText = data.messages || data.message;
+    if (responseText && responseText !== "Workflow was started") {
+      messages.push({
+        id: messageIdCounter.current++,
+        text: responseText,
+        isUser: false,
+        time: currentTime,
+        createdAt: Date.now(),
+        type: 'text'
+      });
+    }
+  }
+  
+  return messages;
+}
+
 // Componente para renderizar o conteúdo da mensagem com base no tipo
 interface MessageContentProps {
   message: Message;
