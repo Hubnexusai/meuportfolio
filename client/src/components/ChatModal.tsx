@@ -55,22 +55,22 @@ const ModalContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(0, 204, 255, 0.3);
 `;
 
 const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   padding: 1rem;
-  background: linear-gradient(to right, #1e3a8a, #1a2151);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  background: linear-gradient(to right, #000935, #0f172a);
+  border-bottom: 1px solid rgba(0, 204, 255, 0.3);
 `;
 
 const AgentAvatar = styled.div`
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(to bottom right, #6b46c1, #2563eb);
+  background: linear-gradient(to bottom right, #000935, #00CCFF);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,7 +216,7 @@ const ChatInput = styled.input`
 `;
 
 const SendButton = styled.button`
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   border: none;
   color: white;
   width: 2.5rem;
