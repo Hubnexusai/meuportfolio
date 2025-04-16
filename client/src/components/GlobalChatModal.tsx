@@ -635,18 +635,31 @@ const GlobalChatModal: React.FC = () => {
   // Reseta as mensagens quando o modal é aberto
   useEffect(() => {
     if (isOpen && agentName) {
-      // Não adiciona mensagem inicial, apenas limpa as mensagens
+      // Limpa as mensagens anteriores
       setMessages([]);
       messageIdCounter.current = 1;
+      
+      // Adiciona uma única mensagem de boas-vindas
+      const welcomeMessage: Message = {
+        id: messageIdCounter.current++,
+        text: `Olá, você está no ${agentName}.`,
+        isUser: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now(),
+        type: 'text'
+      };
+      
+      setMessages([welcomeMessage]);
       
       // Iniciar enviando uma mensagem automática para o webhook apenas para notificar abertura
       const webhookPayload = {
         agent: slugifyAgentName(agentName),
         message: "CHAT_OPENED",
-        typeMessage: "system"
+        typeMessage: "system",
+        sessionId: sessionId
       };
       
-      // Enviar requisição silenciosa para o webhook
+      // Enviar requisição silenciosa para o webhook (não exibimos a resposta na primeira abertura)
       fetch(webhookUrl, {
         method: 'POST',
         headers: {
@@ -657,48 +670,7 @@ const GlobalChatModal: React.FC = () => {
       .then(response => response.json())
       .then(data => {
         console.log('Abertura de chat - resposta:', data);
-        
-        // Verifica se a resposta é um array de mensagens
-        if (Array.isArray(data)) {
-          // Processa cada mensagem do array
-          data.forEach(item => {
-            if (item.message) {
-              const messageType = item.typeMessage?.toLowerCase() || 'text';
-              
-              const welcomeMessage: Message = {
-                id: messageIdCounter.current++,
-                text: item.message,
-                isUser: false,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                createdAt: Date.now(),
-                type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
-              };
-              
-              setMessages(prev => [...prev, welcomeMessage]);
-            }
-          });
-        } else {
-          // Formato antigo - mensagem única
-          let responseText = data && (data.messages || data.message);
-          
-          // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
-          if (responseText === "Workflow was started") {
-            responseText = `Olá, você está no ${agentName}.`;
-          }
-          
-          if (responseText) {
-            const welcomeMessage: Message = {
-              id: messageIdCounter.current++,
-              text: responseText,
-              isUser: false,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              createdAt: Date.now(),
-              type: 'text'
-            };
-            
-            setMessages(prev => [...prev, welcomeMessage]);
-          }
-        }
+        // Não exibimos a resposta do webhook na abertura inicial
       })
       .catch(error => {
         console.error('Erro ao notificar abertura de chat:', error);
@@ -724,6 +696,16 @@ const GlobalChatModal: React.FC = () => {
       .replace(/^-+|-+$/g, ''); // Remove hífens no início e fim
   };
   
+  // Função para gerar um ID de sessão único
+  const generateSessionId = () => {
+    const randomPart = Math.random().toString(36).substring(2, 10);
+    const timestampPart = Date.now().toString(36);
+    return `${randomPart}-${timestampPart}`;
+  };
+  
+  // Armazena o ID de sessão para todas as requisições
+  const [sessionId] = useState(() => generateSessionId());
+  
   // Função para enviar áudio
   const handleSendAudio = () => {
     if (!audioBase64) return;
@@ -747,7 +729,8 @@ const GlobalChatModal: React.FC = () => {
     const webhookPayload = {
       agent: slugifyAgentName(agentName),
       message: audioBase64,
-      typeMessage: "audio"
+      typeMessage: "audio",
+      sessionId: sessionId
     };
     
     // Envia requisição HTTP POST para o webhook
@@ -855,7 +838,8 @@ const GlobalChatModal: React.FC = () => {
     const webhookPayload = {
       agent: slugifyAgentName(agentName),
       message: inputValue,
-      typeMessage: "text"
+      typeMessage: "text",
+      sessionId: sessionId
     };
     
     // Envia requisição HTTP POST para o webhook
