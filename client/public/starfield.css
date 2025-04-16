@@ -1,0 +1,41 @@
+#starfield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: #0f172a;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle var(--duration) infinite ease-in-out alternate;
+}
+
+.star-1 {
+  background-color: #00CCFF;
+}
+
+.star-2 {
+  background-color: #FFFFFF;
+}
+
+.star-3 {
+  background-color: #000935;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.2;
+    box-shadow: 0 0 2px 1px rgba(0, 204, 255, 0);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 4px 2px rgba(0, 204, 255, 0.7);
+  }
+}
