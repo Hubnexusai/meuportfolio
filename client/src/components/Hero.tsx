@@ -41,7 +41,7 @@ const HeroTitle = styled.h2`
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    background-image: linear-gradient(to right, #c4b5fd, #8b5cf6);
+    background-image: linear-gradient(to right, #FFFFFF, #00CCFF);
   }
   
   @keyframes float {
@@ -77,7 +77,7 @@ const PrimaryButton = styled.a`
   display: inline-block;
   width: 100%;
   padding: 0.875rem 2rem;
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   color: white;
   border-radius: 0.5rem;
   font-weight: 500;
@@ -102,7 +102,7 @@ const PrimaryButton = styled.a`
     left: -50%;
     width: 200%;
     height: 200%;
-    background: linear-gradient(transparent, rgba(139, 92, 246, 0.1), transparent);
+    background: linear-gradient(transparent, rgba(0, 204, 255, 0.2), transparent);
     opacity: 0;
     transform: rotate(30deg);
     transition: opacity 0.3s ease;
@@ -124,8 +124,8 @@ const SecondaryButton = styled.a`
   display: inline-block;
   width: 100%;
   padding: 0.875rem 2rem;
-  border: 1px solid #8b5cf6;
-  color: #c4b5fd;
+  border: 1px solid #00CCFF;
+  color: #FFFFFF;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 1.125rem;
@@ -136,7 +136,7 @@ const SecondaryButton = styled.a`
   }
   
   &:hover {
-    background-color: rgba(139, 92, 246, 0.1);
+    background-color: rgba(0, 204, 255, 0.1);
   }
 `;
 
