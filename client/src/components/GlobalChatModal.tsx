@@ -658,25 +658,46 @@ const GlobalChatModal: React.FC = () => {
       .then(data => {
         console.log('Abertura de chat - resposta:', data);
         
-        // Verifica se há uma mensagem inicial do webhook (nos formatos "messages" ou "message")
-        let responseText = data && (data.messages || data.message);
-        
-        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
-        if (responseText === "Workflow was started") {
-          responseText = `Olá, você está no ${agentName}.`;
-        }
-        
-        if (responseText) {
-          const welcomeMessage: Message = {
-            id: messageIdCounter.current++,
-            text: responseText,
-            isUser: false,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            createdAt: Date.now(),
-            type: 'text'
-          };
+        // Verifica se a resposta é um array de mensagens
+        if (Array.isArray(data)) {
+          // Processa cada mensagem do array
+          data.forEach(item => {
+            if (item.message) {
+              const messageType = item.typeMessage?.toLowerCase() || 'text';
+              
+              const welcomeMessage: Message = {
+                id: messageIdCounter.current++,
+                text: item.message,
+                isUser: false,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                createdAt: Date.now(),
+                type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+              };
+              
+              setMessages(prev => [...prev, welcomeMessage]);
+            }
+          });
+        } else {
+          // Formato antigo - mensagem única
+          let responseText = data && (data.messages || data.message);
           
-          setMessages(prev => [...prev, welcomeMessage]);
+          // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+          if (responseText === "Workflow was started") {
+            responseText = `Olá, você está no ${agentName}.`;
+          }
+          
+          if (responseText) {
+            const welcomeMessage: Message = {
+              id: messageIdCounter.current++,
+              text: responseText,
+              isUser: false,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              createdAt: Date.now(),
+              type: 'text'
+            };
+            
+            setMessages(prev => [...prev, welcomeMessage]);
+          }
         }
       })
       .catch(error => {
@@ -741,32 +762,50 @@ const GlobalChatModal: React.FC = () => {
     .then(data => {
       console.log('Webhook response data (áudio):', data);
       
-      // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
-      let responseText = data && (data.messages || data.message);
+      // Desativa o indicador de digitação
+      setIsTyping(false);
       
-      // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
-      if (responseText === "Workflow was started") {
-        responseText = `Olá, você está no ${agentName}.`;
-      }
-      
-      if (responseText) {
-        // Adiciona a mensagem do agente vinda do webhook
-        const newAgentMessage: Message = {
-          id: messageIdCounter.current++,
-          text: responseText,
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now(),
-          type: 'text'
-        };
-        
-        setMessages(prev => [...prev, newAgentMessage]);
-        setIsTyping(false);
+      // Verifica se a resposta é um array de mensagens
+      if (Array.isArray(data)) {
+        // Processa cada mensagem do array
+        data.forEach(item => {
+          if (item.message) {
+            const messageType = item.typeMessage?.toLowerCase() || 'text';
+            
+            const newAgentMessage: Message = {
+              id: messageIdCounter.current++,
+              text: item.message,
+              isUser: false,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              createdAt: Date.now(),
+              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+            };
+            
+            setMessages(prev => [...prev, newAgentMessage]);
+          }
+        });
       } else {
-        // Se não houver mensagem ou formato não esperado
-        setTimeout(() => {
-          setIsTyping(false);
-        }, 3000);
+        // Formato antigo - mensagem única
+        let responseText = data && (data.messages || data.message);
+        
+        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+        if (responseText === "Workflow was started") {
+          responseText = `Olá, você está no ${agentName}.`;
+        }
+        
+        if (responseText) {
+          // Adiciona a mensagem do agente vinda do webhook
+          const newAgentMessage: Message = {
+            id: messageIdCounter.current++,
+            text: responseText,
+            isUser: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            createdAt: Date.now(),
+            type: 'text'
+          };
+          
+          setMessages(prev => [...prev, newAgentMessage]);
+        }
       }
     })
     .catch(error => {
@@ -831,32 +870,50 @@ const GlobalChatModal: React.FC = () => {
     .then(data => {
       console.log('Webhook response data (texto):', data);
       
-      // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
-      let responseText = data && (data.messages || data.message);
+      // Desativa o indicador de digitação
+      setIsTyping(false);
       
-      // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
-      if (responseText === "Workflow was started") {
-        responseText = `Olá, você está no ${agentName}.`;
-      }
-      
-      if (responseText) {
-        // Adiciona a mensagem do agente vinda do webhook
-        const newAgentMessage: Message = {
-          id: messageIdCounter.current++,
-          text: responseText,
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now(),
-          type: 'text'
-        };
-        
-        setMessages(prev => [...prev, newAgentMessage]);
-        setIsTyping(false);
+      // Verifica se a resposta é um array de mensagens
+      if (Array.isArray(data)) {
+        // Processa cada mensagem do array
+        data.forEach(item => {
+          if (item.message) {
+            const messageType = item.typeMessage?.toLowerCase() || 'text';
+            
+            const newAgentMessage: Message = {
+              id: messageIdCounter.current++,
+              text: item.message,
+              isUser: false,
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              createdAt: Date.now(),
+              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+            };
+            
+            setMessages(prev => [...prev, newAgentMessage]);
+          }
+        });
       } else {
-        // Se não houver mensagem ou formato não esperado
-        setTimeout(() => {
-          setIsTyping(false);
-        }, 3000);
+        // Formato antigo - mensagem única
+        let responseText = data && (data.messages || data.message);
+        
+        // Se a resposta for "Workflow was started", substitui pela mensagem personalizada
+        if (responseText === "Workflow was started") {
+          responseText = `Olá, você está no ${agentName}.`;
+        }
+        
+        if (responseText) {
+          // Adiciona a mensagem do agente vinda do webhook
+          const newAgentMessage: Message = {
+            id: messageIdCounter.current++,
+            text: responseText,
+            isUser: false,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            createdAt: Date.now(),
+            type: 'text'
+          };
+          
+          setMessages(prev => [...prev, newAgentMessage]);
+        }
       }
     })
     .catch(error => {
