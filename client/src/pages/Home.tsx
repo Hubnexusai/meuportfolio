@@ -12,10 +12,10 @@ import SkyParticles from '../components/SkyParticles';
 
 const HomeContainer = styled.div`
   min-height: 100vh;
-  background-color: #0f172a;
+  background-color: #000935;
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(107, 70, 193, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 10% 20%, rgba(0, 204, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
   overflow-x: hidden;
   position: relative;
 `;

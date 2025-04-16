@@ -1,18 +1,19 @@
 /* -----------------------------------------------
  * Particles.js - Configuration file
+ * Cores da empresa: #00CCFF #FFFFFF #000935
  * ----------------------------------------------- */
 
 particlesJS('particles-js', {
   "particles": {
     "number": {
-      "value": 80,
+      "value": 100,
       "density": {
         "enable": true,
         "value_area": 800
       }
     },
     "color": {
-      "value": ["#6b46c1", "#2563eb", "#3b82f6", "#8b5cf6"]
+      "value": ["#00CCFF", "#FFFFFF", "#000935"]
     },
     "shape": {
       "type": "circle",
@@ -22,11 +23,11 @@ particlesJS('particles-js', {
       }
     },
     "opacity": {
-      "value": 0.5,
+      "value": 0.6,
       "random": false,
       "anim": {
-        "enable": false,
-        "speed": 1,
+        "enable": true,
+        "speed": 2,
         "opacity_min": 0.1,
         "sync": false
       }
@@ -35,7 +36,7 @@ particlesJS('particles-js', {
       "value": 3,
       "random": true,
       "anim": {
-        "enable": false,
+        "enable": true,
         "speed": 40,
         "size_min": 0.1,
         "sync": false
@@ -44,20 +45,20 @@ particlesJS('particles-js', {
     "line_linked": {
       "enable": true,
       "distance": 150,
-      "color": "#8b5cf6",
-      "opacity": 0.3,
+      "color": "#00CCFF",
+      "opacity": 0.4,
       "width": 1
     },
     "move": {
       "enable": true,
-      "speed": 1,
+      "speed": 3,
       "direction": "none",
       "random": true,
       "straight": false,
       "out_mode": "out",
       "bounce": false,
       "attract": {
-        "enable": false,
+        "enable": true,
         "rotateX": 600,
         "rotateY": 1200
       }
@@ -78,9 +79,9 @@ particlesJS('particles-js', {
     },
     "modes": {
       "grab": {
-        "distance": 140,
+        "distance": 180,
         "line_linked": {
-          "opacity": 0.8
+          "opacity": 0.9
         }
       },
       "bubble": {
@@ -95,7 +96,7 @@ particlesJS('particles-js', {
         "duration": 0.4
       },
       "push": {
-        "particles_nb": 4
+        "particles_nb": 6
       },
       "remove": {
         "particles_nb": 2

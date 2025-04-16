@@ -17,7 +17,7 @@ const particleDelayedAnimation = keyframes`
 
 const Particle = styled.div`
   position: absolute;
-  background-color: rgba(139, 92, 246, 0.4);
+  background-color: rgba(0, 204, 255, 0.4);
   border-radius: 50%;
   pointer-events: none;
 `;

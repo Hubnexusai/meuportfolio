@@ -18,8 +18,8 @@ const NeuralBackground: React.FC = () => {
       <svg width="100%" height="100%" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="neuron-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#6b46c1" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#2563eb" stopOpacity="0.6" />
+            <stop offset="0%" stopColor="#00CCFF" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.6" />
           </linearGradient>
         </defs>
         {/* Network lines */}
