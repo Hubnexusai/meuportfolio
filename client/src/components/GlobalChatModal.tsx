@@ -796,13 +796,30 @@ const GlobalChatModal: React.FC = () => {
       },
       body: JSON.stringify(webhookPayload),
     })
-    .then(response => {
-      console.log('Webhook request enviado com sucesso:', response.status);
+    .then(response => response.json())
+    .then(data => {
+      console.log('Webhook response data (texto):', data);
       
-      // Mantém o indicador de digitação ativo por 5 segundos para dar feedback visual ao usuário
-      setTimeout(() => {
+      // Processa a resposta no formato { "messages": "texto da mensagem" }
+      if (data && data.messages) {
+        // Adiciona a mensagem do agente vinda do webhook
+        const newAgentMessage = {
+          id: messageIdCounter.current++,
+          text: data.messages,
+          isUser: false,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+          type: 'text'
+        };
+        
+        setMessages(prev => [...prev, newAgentMessage]);
         setIsTyping(false);
-      }, 5000);
+      } else {
+        // Se não houver mensagem ou formato não esperado
+        setTimeout(() => {
+          setIsTyping(false);
+        }, 3000);
+      }
     })
     .catch(error => {
       console.error('Erro ao enviar para o webhook:', error);
