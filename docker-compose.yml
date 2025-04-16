@@ -1,16 +1,34 @@
 version: '3.8'
 
 services:
-  app:
+  portfolio:
+    image: ${DOCKER_REGISTRY:-hub-nexus}/portfolio:${TAG:-latest}
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:5000"
-    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PORT=5000
       - NODE_OPTIONS=--experimental-specifier-resolution=node
-      - VITE_LOGO_URL=${VITE_LOGO_URL:-https://meudominio.com/nomedaimagem.svg}
-      - VITE_WEBHOOK_URL=${VITE_WEBHOOK_URL:-https://webhook.dev.testandoaulanapratica.shop/webhook/portfolio_virtual}
+      - VITE_LOGO_URL=${VITE_LOGO_URL:-https://ykrznbgxhdulsatplwnp.supabase.co/storage/v1/object/public/imagem//LOGO%203D%20SEM%20FUNDO.png}
+      - VITE_WEBHOOK_URL=${VITE_WEBHOOK_URL:-https://webhook.hubnexusai.com/webhook/meuportfolio}
+      - DOMAIN=${DOMAIN:-portfolio.hubnexusai.com}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_public"
+        - "traefik.http.routers.portfolio.rule=Host(`${DOMAIN:-portfolio.hubnexusai.com}`)"
+        - "traefik.http.routers.portfolio.entrypoints=websecure"
+        - "traefik.http.routers.portfolio.tls.certresolver=le"
+        - "traefik.http.services.portfolio.loadbalancer.server.port=5000"
+    networks:
+      - traefik_public
+
+networks:
+  traefik_public:
+    external: true

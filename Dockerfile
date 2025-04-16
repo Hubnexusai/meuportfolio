@@ -26,10 +26,10 @@ FROM node:18-alpine
 ENV NODE_ENV=production
 ENV PORT=5000
 ENV NODE_OPTIONS=--experimental-specifier-resolution=node
-# Variável de ambiente para o logo (pode ser sobrescrita durante o deploy)
-ENV VITE_LOGO_URL=https://meudominio.com/nomedaimagem.svg
-# Variável de ambiente para o webhook (pode ser sobrescrita durante o deploy)
-ENV VITE_WEBHOOK_URL=https://webhook.dev.testandoaulanapratica.shop/webhook/portfolio_virtual
+# Variáveis de ambiente configuráveis via docker-compose
+ENV VITE_LOGO_URL=https://ykrznbgxhdulsatplwnp.supabase.co/storage/v1/object/public/imagem//LOGO%203D%20SEM%20FUNDO.png
+ENV VITE_WEBHOOK_URL=https://webhook.hubnexusai.com/webhook/meuportfolio
+ENV DOMAIN=portfolio.hubnexusai.com
 
 # Diretório de trabalho
 WORKDIR /app
