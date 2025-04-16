@@ -658,11 +658,13 @@ const GlobalChatModal: React.FC = () => {
       .then(data => {
         console.log('Abertura de chat - resposta:', data);
         
-        // Verifica se há uma mensagem inicial do webhook
-        if (data && data.messages) {
+        // Verifica se há uma mensagem inicial do webhook (nos formatos "messages" ou "message")
+        const responseText = data && (data.messages || data.message);
+        
+        if (responseText) {
           const welcomeMessage: Message = {
             id: messageIdCounter.current++,
-            text: data.messages,
+            text: responseText,
             isUser: false,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             createdAt: Date.now(),
@@ -730,13 +732,32 @@ const GlobalChatModal: React.FC = () => {
       },
       body: JSON.stringify(webhookPayload),
     })
-    .then(response => {
-      console.log('Webhook request enviado com sucesso:', response.status);
+    .then(response => response.json())
+    .then(data => {
+      console.log('Webhook response data (áudio):', data);
       
-      // Mantém o indicador de digitação ativo por 5 segundos para dar feedback visual ao usuário
-      setTimeout(() => {
+      // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
+      const responseText = data && (data.messages || data.message);
+      
+      if (responseText) {
+        // Adiciona a mensagem do agente vinda do webhook
+        const newAgentMessage: Message = {
+          id: messageIdCounter.current++,
+          text: responseText,
+          isUser: false,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+          type: 'text'
+        };
+        
+        setMessages(prev => [...prev, newAgentMessage]);
         setIsTyping(false);
-      }, 5000);
+      } else {
+        // Se não houver mensagem ou formato não esperado
+        setTimeout(() => {
+          setIsTyping(false);
+        }, 3000);
+      }
     })
     .catch(error => {
       console.error('Erro ao enviar áudio para o webhook:', error);
@@ -800,12 +821,14 @@ const GlobalChatModal: React.FC = () => {
     .then(data => {
       console.log('Webhook response data (texto):', data);
       
-      // Processa a resposta no formato { "messages": "texto da mensagem" }
-      if (data && data.messages) {
+      // Processa a resposta nos formatos { "messages": "texto" } ou { "message": "texto" }
+      const responseText = data && (data.messages || data.message);
+      
+      if (responseText) {
         // Adiciona a mensagem do agente vinda do webhook
-        const newAgentMessage = {
+        const newAgentMessage: Message = {
           id: messageIdCounter.current++,
-          text: data.messages,
+          text: responseText,
           isUser: false,
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           createdAt: Date.now(),
