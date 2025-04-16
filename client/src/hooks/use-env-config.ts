@@ -22,12 +22,11 @@ export const useWebhookUrl = () => {
   const [webhookUrl, setWebhookUrl] = useState<string>('');
   
   useEffect(() => {
-    const envWebhookUrl = import.meta.env.VITE_WEBHOOK_URL;
-    const defaultWebhookUrl = 'https://webhook.dev.testandoaulanapratica.shop/webhook/portfolio_virtual';
+    // Usar apenas a URL fornecida pelo cliente
+    const webhookURL = 'https://webhook.hubnexusai.com/webhook/meuportfolio';
     
-    const finalWebhookUrl = envWebhookUrl || defaultWebhookUrl;
-    console.log('VITE_WEBHOOK_URL ou URL padrão:', finalWebhookUrl);
-    setWebhookUrl(finalWebhookUrl);
+    console.log('Usando webhook URL:', webhookURL);
+    setWebhookUrl(webhookURL);
   }, []);
   
   return webhookUrl;

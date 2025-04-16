@@ -343,27 +343,8 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose, agentName, agent
     })
     .then(response => {
       console.log('Webhook response:', response.status);
-      // Simula a resposta do agente após receber confirmação do webhook
-      setTimeout(() => {
-        const agentResponses = [
-          `Como posso ajudar você com ${agentName}?`,
-          `Tenho várias opções para atender suas necessidades de ${agentName}.`,
-          `Posso oferecer soluções personalizadas para ${agentName}.`,
-          `Deixe-me mostrar como nosso serviço de ${agentName} pode beneficiar você.`
-        ];
-        
-        const randomResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
-        
-        const newAgentMessage: Message = {
-          id: messageIdCounter.current++,
-          text: randomResponse,
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now()
-        };
-        
-        setMessages(prev => [...prev, newAgentMessage]);
-      }, 1000);
+      // Não processa a resposta internamente, deixa que o webhook 
+      // processe e responda como necessário. Não simula nenhuma resposta.
     })
     .catch(error => {
       console.error('Erro ao enviar para o webhook:', error);

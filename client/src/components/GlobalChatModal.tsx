@@ -919,92 +919,13 @@ const GlobalChatModal: React.FC = () => {
       },
       body: JSON.stringify(webhookPayload),
     })
-    .then(response => response.json())
-    .then((responseData) => {
-      console.log('Webhook response data:', responseData);
+    .then(response => {
+      console.log('Webhook request enviado com sucesso:', response.status);
+      // Não processamos a resposta - o webhook não deve responder
       
-      // Extrai as mensagens da estrutura aninhada
-      let messages: Array<{message: string, typeMessage: 'audio' | 'image' | 'document' | 'video' | 'text'}> = [];
-      
-      // Analisando o formato real do response com logs
-      console.log('Tipo de responseData:', typeof responseData);
-      if (typeof responseData === 'object' && responseData !== null) {
-        console.log('Propriedades de responseData:', Object.keys(responseData));
-      }
-      
-      // Tenta extrair mensagens de todos os formatos possíveis
-      if (Array.isArray(responseData) && responseData.length > 0) {
-        // Formato 1: [{messages: [{message, typeMessage}, ...]}]
-        if (responseData[0]?.messages && Array.isArray(responseData[0].messages)) {
-          messages = responseData[0].messages;
-          console.log('Formato 1 detectado:', messages);
-        } 
-        // Formato 2: [{message, typeMessage}, ...]
-        else if (responseData[0]?.message && responseData[0]?.typeMessage) {
-          messages = responseData;
-          console.log('Formato 2 detectado:', messages);
-        }
-      }
-      // Formato 3: {messages: [{message, typeMessage}, ...]}
-      else if (responseData?.messages && Array.isArray(responseData.messages)) {
-        messages = responseData.messages;
-        console.log('Formato 3 detectado:', messages);
-      }
-      
-      // Processa cada mensagem da resposta com delay entre elas
-      if (messages.length > 0) {
-        console.log('Mensagens processadas:', messages);
-        
-        // Função para adicionar mensagens sequencialmente com delay
-        const addMessagesWithDelay = (msgs: typeof messages, index: number) => {
-          if (index >= msgs.length) {
-            return;
-          }
-          
-          // Verifica se é a última mensagem
-          const isLastMessage = index === msgs.length - 1;
-          
-          // Se for a última mensagem, desativa o indicador ANTES de exibi-la
-          if (isLastMessage) {
-            setIsTyping(false);
-          }
-          
-          const item = msgs[index];
-          const newAgentMessage: Message = {
-            id: messageIdCounter.current++,
-            text: item.message,
-            isUser: false,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            createdAt: Date.now(),
-            type: item.typeMessage
-          };
-          
-          setMessages(prev => [...prev, newAgentMessage]);
-          
-          // Agenda a próxima mensagem com delay de 2 segundos
-          setTimeout(() => {
-            addMessagesWithDelay(msgs, index + 1);
-          }, 2000);
-        };
-        
-        // Inicia o processo com a primeira mensagem
-        addMessagesWithDelay(messages, 0);
-      } else {
-        // Fallback para quando não há resposta do webhook ou formato é inválido
-        console.log('Usando mensagem fallback - formato de resposta não reconhecido');
-        const fallbackMessage: Message = {
-          id: messageIdCounter.current++,
-          text: `Como posso ajudar você com ${agentName}?`,
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now(),
-          type: 'text'
-        };
-        
-        setMessages(prev => [...prev, fallbackMessage]);
-        // Desativa o indicador de digitação para a mensagem fallback
-        setIsTyping(false);
-      }
+      // Desativa o indicador de digitação após o envio
+      setIsTyping(false);
+    }
     })
     .catch(error => {
       console.error('Erro ao enviar para o webhook:', error);
