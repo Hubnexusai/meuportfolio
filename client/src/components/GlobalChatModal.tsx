@@ -396,13 +396,31 @@ interface Message {
 function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObject<number>): Message[] {
   const messages: Message[] = [];
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  console.log("Processando resposta webhook:", JSON.stringify(data));
   
-  // Caso 1: Resposta é um array com estrutura aninhada [{ output: [{ message, typeMessage }] }]
-  if (Array.isArray(data)) {
-    data.forEach(outerItem => {
+  // Caso 1: Resposta tem um campo 'output' (formato novo)
+  if (data && data.output && Array.isArray(data.output)) {
+    data.output.forEach((item: {message?: string, typeMessage?: string}) => {
+      if (item.message && item.message !== "Workflow was started") {
+        const messageType = item.typeMessage?.toLowerCase() || 'text';
+        messages.push({
+          id: messageIdCounter.current++,
+          text: item.message,
+          isUser: false,
+          time: currentTime,
+          createdAt: Date.now(),
+          type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+        });
+      }
+    });
+  }
+  // Caso 2: Resposta é um array com estrutura aninhada [{ output: [{ message, typeMessage }] }]
+  else if (Array.isArray(data)) {
+    data.forEach((outerItem: any) => {
       // Verifica o formato com output aninhado
       if (outerItem.output && Array.isArray(outerItem.output)) {
-        outerItem.output.forEach(item => {
+        outerItem.output.forEach((item: {message?: string, typeMessage?: string}) => {
           if (item.message && item.message !== "Workflow was started") {
             const messageType = item.typeMessage?.toLowerCase() || 'text';
             messages.push({
@@ -430,7 +448,7 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
       }
     });
   } 
-  // Caso 2: Resposta é um objeto com message ou messages
+  // Caso 3: Resposta é um objeto com message ou messages
   else if (data) {
     const responseText = data.messages || data.message;
     if (responseText && responseText !== "Workflow was started") {
@@ -691,6 +709,16 @@ const GlobalChatModal: React.FC = () => {
   // Estado para controlar se já exibimos mensagem inicial
   const [welcomeMessageShown, setWelcomeMessageShown] = useState(false);
   
+  // Função para gerar um ID de sessão único
+  const generateSessionId = () => {
+    const randomPart = Math.random().toString(36).substring(2, 10);
+    const timestampPart = Date.now().toString(36);
+    return `${randomPart}-${timestampPart}`;
+  };
+  
+  // Armazena o ID de sessão para todas as requisições
+  const [sessionId] = useState(() => generateSessionId());
+  
   // Reseta as mensagens quando o modal é aberto
   useEffect(() => {
     if (isOpen && agentName) {
@@ -737,7 +765,7 @@ const GlobalChatModal: React.FC = () => {
         console.error('Erro ao notificar abertura de chat:', error);
       });
     }
-  }, [isOpen, agentName]);
+  }, [isOpen, agentName, webhookUrl, sessionId]);
   
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -756,16 +784,6 @@ const GlobalChatModal: React.FC = () => {
       .replace(/-+/g, '-') // Remove múltiplos hífens
       .replace(/^-+|-+$/g, ''); // Remove hífens no início e fim
   };
-  
-  // Função para gerar um ID de sessão único
-  const generateSessionId = () => {
-    const randomPart = Math.random().toString(36).substring(2, 10);
-    const timestampPart = Date.now().toString(36);
-    return `${randomPart}-${timestampPart}`;
-  };
-  
-  // Armazena o ID de sessão para todas as requisições
-  const [sessionId] = useState(() => generateSessionId());
   
   // Função para enviar áudio
   const handleSendAudio = () => {
@@ -809,47 +827,12 @@ const GlobalChatModal: React.FC = () => {
       // Desativa o indicador de digitação
       setIsTyping(false);
       
-      // Verifica se a resposta é um array de mensagens
-      if (Array.isArray(data)) {
-        // Processa cada mensagem do array
-        data.forEach(item => {
-          if (item.message) {
-            const messageType = item.typeMessage?.toLowerCase() || 'text';
-            
-            const newAgentMessage: Message = {
-              id: messageIdCounter.current++,
-              text: item.message,
-              isUser: false,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              createdAt: Date.now(),
-              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
-            };
-            
-            setMessages(prev => [...prev, newAgentMessage]);
-          }
-        });
-      } else {
-        // Formato antigo - mensagem única
-        let responseText = data && (data.messages || data.message);
-        
-        // Ignora completamente respostas "Workflow was started" para evitar duplicações
-        if (responseText === "Workflow was started") {
-          responseText = null; // Define como null para não processar essa mensagem
-        }
-        
-        if (responseText) {
-          // Adiciona a mensagem do agente vinda do webhook
-          const newAgentMessage: Message = {
-            id: messageIdCounter.current++,
-            text: responseText,
-            isUser: false,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            createdAt: Date.now(),
-            type: 'text'
-          };
-          
-          setMessages(prev => [...prev, newAgentMessage]);
-        }
+      // Processa a resposta utilizando a função auxiliar
+      const newMessages = processWebhookResponse(data, messageIdCounter);
+      
+      // Adiciona as novas mensagens ao estado
+      if (newMessages.length > 0) {
+        setMessages(prev => [...prev, ...newMessages]);
       }
     })
     .catch(error => {
@@ -918,47 +901,12 @@ const GlobalChatModal: React.FC = () => {
       // Desativa o indicador de digitação
       setIsTyping(false);
       
-      // Verifica se a resposta é um array de mensagens
-      if (Array.isArray(data)) {
-        // Processa cada mensagem do array
-        data.forEach(item => {
-          if (item.message) {
-            const messageType = item.typeMessage?.toLowerCase() || 'text';
-            
-            const newAgentMessage: Message = {
-              id: messageIdCounter.current++,
-              text: item.message,
-              isUser: false,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              createdAt: Date.now(),
-              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
-            };
-            
-            setMessages(prev => [...prev, newAgentMessage]);
-          }
-        });
-      } else {
-        // Formato antigo - mensagem única
-        let responseText = data && (data.messages || data.message);
-        
-        // Ignora completamente respostas "Workflow was started" para evitar duplicações
-        if (responseText === "Workflow was started") {
-          responseText = null; // Define como null para não processar essa mensagem
-        }
-        
-        if (responseText) {
-          // Adiciona a mensagem do agente vinda do webhook
-          const newAgentMessage: Message = {
-            id: messageIdCounter.current++,
-            text: responseText,
-            isUser: false,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            createdAt: Date.now(),
-            type: 'text'
-          };
-          
-          setMessages(prev => [...prev, newAgentMessage]);
-        }
+      // Processa a resposta utilizando a função auxiliar
+      const newMessages = processWebhookResponse(data, messageIdCounter);
+      
+      // Adiciona as novas mensagens ao estado
+      if (newMessages.length > 0) {
+        setMessages(prev => [...prev, ...newMessages]);
       }
     })
     .catch(error => {

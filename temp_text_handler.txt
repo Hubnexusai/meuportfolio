@@ -1,0 +1,15 @@
+    .then(response => response.json())
+    .then(data => {
+      console.log('Webhook response data (texto):', data);
+      
+      // Desativa o indicador de digitação
+      setIsTyping(false);
+      
+      // Processa a resposta utilizando a função auxiliar
+      const newMessages = processWebhookResponse(data, messageIdCounter);
+      
+      // Adiciona as novas mensagens ao estado
+      if (newMessages.length > 0) {
+        setMessages(prev => [...prev, ...newMessages]);
+      }
+    })
