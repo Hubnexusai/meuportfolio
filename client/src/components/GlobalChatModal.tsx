@@ -154,7 +154,7 @@ const AgentAvatar = styled.div`
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(to bottom right, #6b46c1, #2563eb);
+  background: linear-gradient(to bottom right, #000935, #00CCFF);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,7 +231,7 @@ const BubbleContainer = styled.div<{ $isUser: boolean }>`
   padding: 0.75rem 1rem;
   border-radius: 1.5rem;
   background: ${props => props.$isUser 
-    ? 'linear-gradient(120deg, #6b46c1, #3a6bd3)' 
+    ? 'linear-gradient(120deg, #000935, #00CCFF)' 
     : 'rgba(45, 55, 72, 0.7)'};
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -289,7 +289,7 @@ const ChatInput = styled.input`
 `;
 
 const ActionButton = styled.button`
-  background: linear-gradient(to right, #6b46c1, #2563eb);
+  background: linear-gradient(to right, #000935, #00CCFF);
   border: none;
   color: white;
   width: 2.5rem;
@@ -311,7 +311,7 @@ const SendButton = styled(ActionButton)``;
 const RecordButton = styled(ActionButton)<{ $isRecording?: boolean }>`
   background: ${props => props.$isRecording 
     ? 'linear-gradient(to right, #e11d48, #f43f5e)' 
-    : 'linear-gradient(to right, #4f46e5, #6366f1)'};
+    : 'linear-gradient(to right, #000935, #00CCFF)'};
   animation: ${props => props.$isRecording ? 'pulse 2s infinite' : 'none'};
   
   @keyframes pulse {
