@@ -78,9 +78,6 @@ const Header: React.FC = () => {
               // Se houver uma URL de logo definida, exibe a imagem
               <>
                 <LogoImage src={logoUrl} alt="Logo" />
-                <LogoText style={{ marginLeft: '10px' }}>
-                  Hub Nexus <span>AI</span>
-                </LogoText>
               </>
             ) : (
               // Fallback: exibe o logo padrão se a variável de ambiente não estiver definida
