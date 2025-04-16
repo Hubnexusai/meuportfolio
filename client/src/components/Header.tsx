@@ -34,7 +34,7 @@ const LogoIcon = styled.div`
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.5rem;
-  background: linear-gradient(to bottom right, #6b46c1, #2563eb);
+  background: linear-gradient(to bottom right, #000935, #00CCFF);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -60,7 +60,7 @@ const LogoText = styled.h1`
   font-family: "Audiowide", cursive;
 
   span {
-    color: #a78bfa;
+    color: #00CCFF;
   }
 `;
 

@@ -6,10 +6,11 @@ export const useLogoFromEnv = () => {
   
   useEffect(() => {
     const envLogo = import.meta.env.VITE_LOGO_URL;
-    const defaultLogo = 'https://static.vecteezy.com/system/resources/previews/009/384/620/original/ai-tech-artificial-intelligence-clipart-design-illustration-free-png.png';
+    // URL da logo fornecida pelo cliente
+    const clientLogo = 'https://ykrznbgxhdulsatplwnp.supabase.co/storage/v1/object/public/imagem//LOGO%203D%20SEM%20FUNDO.png';
     
-    const logoSrc = envLogo || defaultLogo;
-    console.log('VITE_LOGO_URL ou URL padrão:', logoSrc);
+    const logoSrc = envLogo || clientLogo;
+    console.log('Logo carregada:', logoSrc);
     setLogoUrl(logoSrc);
   }, []);
   

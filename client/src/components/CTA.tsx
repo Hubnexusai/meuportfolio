@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const CTASection = styled.section`
   position: relative;
@@ -162,6 +163,9 @@ const GridPattern = () => (
   </svg>
 );
 
+// WhatsApp number as a variable that can be changed later
+const WHATSAPP_NUMBER = "+5581989224862";
+
 const CTA: React.FC = () => {
   return (
     <CTASection>
@@ -179,8 +183,8 @@ const CTA: React.FC = () => {
             </Description>
             
             <ButtonContainer>
-              <PrimaryButton href="https://wa.me/5544999998888" target="_blank" rel="noopener noreferrer">
-                Saiba Mais
+              <PrimaryButton href={`https://wa.me/${WHATSAPP_NUMBER.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer">
+                <FaWhatsapp style={{ marginRight: '8px' }} /> Fale Conosco
               </PrimaryButton>
             </ButtonContainer>
           </CTAContent>
