@@ -55,9 +55,11 @@ const Progress = styled.div<{ $width: string }>`
 
 const DurationLabel = styled.div`
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.9);
   display: flex;
   align-items: center;
+  padding: 0 4px;
+  margin-bottom: 2px;
   
   &:before {
     content: '\\f017'; /* Ícone de relógio */

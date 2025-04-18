@@ -502,27 +502,29 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       const audioUrl = parts[0];
       
       // Garantir que a duração é válida para evitar "Infinity:NaN"
-      let duration = '00:00'; // Sempre usar o padrão com dois dígitos para minutos
+      let duration = '00:00'; // Valor padrão caso não tenha duração
       
       if (parts.length > 1 && parts[1]?.includes('duration:')) {
         // Parse mais robusto da duração
         const durationText = parts[1].replace('duration:', '').trim();
         
-        // Verificar se é uma duração válida no formato mm:ss e garantir que está no formato correto
+        // Verificar se é uma duração válida e garantir formato correto "00:00"
         if (/^\d+:\d{2}$/.test(durationText) && 
             durationText !== 'Infinity:NaN' && 
             durationText !== 'undefined:undefined' && 
             durationText !== 'NaN:NaN') {
           
-          // Se a duração não tem dois dígitos para os minutos, adicionar zeros à esquerda
+          // Garantir formato com dois dígitos para minutos e segundos
           const durationParts = durationText.split(':');
           const minutes = durationParts[0].padStart(2, '0');
           const seconds = durationParts[1].padStart(2, '0');
           duration = `${minutes}:${seconds}`;
+          
+          console.log("Áudio com duração válida:", duration);
+        } else {
+          console.log("Áudio com duração inválida, usando padrão:", durationText);
         }
       }
-      
-      console.log("Áudio formatado com duração:", duration);
       
       return (
         <AudioContainer>
@@ -555,16 +557,26 @@ function useAudioRecorder() {
   const [isDiscarded, setIsDiscarded] = useState(false);
   const [audioBase64, setAudioBase64] = useState<string | null>(null);
   
+  // Armazena a duração total da gravação quando ela termina
+  const [finalDuration, setFinalDuration] = useState(0);
+  
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Formata o tempo para exibição
+  // Formata o tempo para exibição durante a gravação
   const formattedTime = useMemo(() => {
     const minutes = Math.floor(recordingTime / 60);
     const seconds = recordingTime % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }, [recordingTime]);
+  
+  // Formata a duração final quando a gravação é concluída
+  const formattedFinalDuration = useMemo(() => {
+    const minutes = Math.floor(finalDuration / 60);
+    const seconds = finalDuration % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }, [finalDuration]);
   
   // Função para iniciar a gravação
   const startRecording = async () => {
@@ -627,6 +639,9 @@ function useAudioRecorder() {
   // Função para interromper a gravação
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
+      // Armazena a duração final antes de parar a gravação
+      setFinalDuration(recordingTime);
+      
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       
@@ -635,6 +650,8 @@ function useAudioRecorder() {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
+      
+      console.log('Gravação finalizada com duração:', recordingTime, 'segundos');
     }
   };
   
@@ -691,6 +708,8 @@ function useAudioRecorder() {
     formattedTime,
     audioBase64,
     isDiscarded,
+    finalDuration,
+    formattedFinalDuration,
     setIsDiscarded,
     startRecording,
     stopRecording,
@@ -721,6 +740,7 @@ const GlobalChatModal: React.FC = () => {
   const {
     isRecording,
     formattedTime,
+    formattedFinalDuration,
     audioBase64,
     setIsDiscarded,
     startRecording,
