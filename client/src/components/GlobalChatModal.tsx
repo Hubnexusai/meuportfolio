@@ -967,8 +967,28 @@ const GlobalChatModal: React.FC = () => {
     }
     
     if (infoCollectionStep === 'whatsapp') {
-      // Armazena o WhatsApp
-      setUserWhatsapp(inputValue.trim());
+      // Validar o WhatsApp - mínimo de 10 dígitos
+      const whatsappValue = inputValue.trim();
+      const whatsappDigits = whatsappValue.replace(/\D/g, ''); // Remove caracteres não numéricos
+      
+      if (whatsappDigits.length < 10) {
+        // Mensagem de erro para número inválido
+        const errorMessage: Message = {
+          id: messageIdCounter.current++,
+          text: 'O número de WhatsApp precisa ter no mínimo 10 dígitos. Por favor, informe um número válido com DDD:',
+          isUser: false,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+          type: 'text'
+        };
+        
+        setMessages(prev => [...prev, errorMessage]);
+        setInputValue('');
+        return;
+      }
+      
+      // Armazena o WhatsApp (validado)
+      setUserWhatsapp(whatsappValue);
       
       // Passa para o próximo passo (email)
       setInfoCollectionStep('email');
@@ -992,8 +1012,27 @@ const GlobalChatModal: React.FC = () => {
     }
     
     if (infoCollectionStep === 'email') {
-      // Armazena o email
-      setUserEmail(inputValue.trim());
+      // Validar o e-mail - deve conter @
+      const emailValue = inputValue.trim();
+      
+      if (!emailValue.includes('@')) {
+        // Mensagem de erro para e-mail inválido
+        const errorMessage: Message = {
+          id: messageIdCounter.current++,
+          text: 'Por favor, informe um e-mail válido contendo "@":',
+          isUser: false,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          createdAt: Date.now(),
+          type: 'text'
+        };
+        
+        setMessages(prev => [...prev, errorMessage]);
+        setInputValue('');
+        return;
+      }
+      
+      // Armazena o email validado
+      setUserEmail(emailValue);
       
       // Marca a coleta de informações como concluída
       setInfoCollectionStep('complete');

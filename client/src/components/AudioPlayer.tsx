@@ -221,7 +221,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => 
     
   return (
     <PlayerContainer>
-      <DurationLabel>{displayDuration}</DurationLabel>
+      {/* Removida a exibição da duração para evitar problemas visuais */}
       
       <ControlsContainer>
         <PlayButton onClick={togglePlayPause}>
