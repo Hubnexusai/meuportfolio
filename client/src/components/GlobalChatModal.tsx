@@ -502,13 +502,23 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       const audioUrl = parts[0];
       
       // Garantir que a duração é válida para evitar "Infinity:NaN"
-      let duration = '0:00';
+      let duration = '00:00'; // Sempre usar o padrão com dois dígitos para minutos
+      
       if (parts.length > 1 && parts[1]?.includes('duration:')) {
         // Parse mais robusto da duração
         const durationText = parts[1].replace('duration:', '').trim();
-        // Verificar se é uma duração válida no formato mm:ss
-        if (/^\d+:\d{2}$/.test(durationText) && durationText !== 'Infinity:NaN') {
-          duration = durationText;
+        
+        // Verificar se é uma duração válida no formato mm:ss e garantir que está no formato correto
+        if (/^\d+:\d{2}$/.test(durationText) && 
+            durationText !== 'Infinity:NaN' && 
+            durationText !== 'undefined:undefined' && 
+            durationText !== 'NaN:NaN') {
+          
+          // Se a duração não tem dois dígitos para os minutos, adicionar zeros à esquerda
+          const durationParts = durationText.split(':');
+          const minutes = durationParts[0].padStart(2, '0');
+          const seconds = durationParts[1].padStart(2, '0');
+          duration = `${minutes}:${seconds}`;
         }
       }
       
@@ -523,7 +533,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       console.error("Erro ao processar áudio:", error);
       return (
         <AudioContainer>
-          <AudioPlayer src={message.text} duration="0:00" />
+          <AudioPlayer src={message.text} duration="00:00" />
         </AudioContainer>
       );
     }
@@ -823,10 +833,12 @@ const GlobalChatModal: React.FC = () => {
     }
     
     // Adiciona mensagem do usuário (áudio) - garantir que a duração seja válida
-    const audioTime = formattedTime || '0:00';
+    // Usar o tempo formatado para garantir consistência
+    console.log('Enviando áudio com duração registrada:', formattedTime);
+    
     const newUserMessage: Message = {
       id: messageIdCounter.current++,
-      text: `data:audio/webm;base64,${audioBase64}|duration:${audioTime}`,
+      text: `data:audio/webm;base64,${audioBase64}|duration:${formattedTime}`,
       isUser: true,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       createdAt: Date.now(),

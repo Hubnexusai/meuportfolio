@@ -72,35 +72,56 @@ interface AudioPlayerProps {
   duration?: string;
 }
 
-// Função simplificada de formatação de tempo
+// Função de formatação de tempo com segundos zerados à esquerda
 const formatTime = (timeInSeconds: number): string => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = Math.floor(timeInSeconds % 60);
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  // Garantir que o valor seja um número não-negativo
+  const validTime = isNaN(timeInSeconds) || timeInSeconds < 0 ? 0 : timeInSeconds;
+  
+  const minutes = Math.floor(validTime / 60);
+  const seconds = Math.floor(validTime % 60);
+  
+  // Garantir formato correto com zeros à esquerda
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
 // Parse a duração no formato "mm:ss" para segundos
 const parseDuration = (duration: string): number => {
   // Verificar se a duração é válida
-  if (!duration || duration === 'undefined:undefined' || duration === 'NaN:NaN' || duration === 'Infinity:NaN') {
+  if (!duration || 
+      duration === 'undefined:undefined' || 
+      duration === 'NaN:NaN' || 
+      duration === 'Infinity:NaN' || 
+      !duration.includes(':')) {
+    console.log('Duração inválida detectada:', duration);
     return 0;
   }
   
   try {
-    const parts = duration.split(':');
+    // Certifique-se de que estamos trabalhando com o formato correto
+    let cleanDuration = duration.trim();
+    
+    // Remover qualquer prefixo "duration:" se estiver presente
+    if (cleanDuration.startsWith('duration:')) {
+      cleanDuration = cleanDuration.substring(9).trim();
+    }
+    
+    const parts = cleanDuration.split(':');
     if (parts.length === 2) {
       const minutes = parseInt(parts[0], 10);
       const seconds = parseInt(parts[1], 10);
       
       // Verificar se os valores são números válidos
       if (isNaN(minutes) || isNaN(seconds)) {
+        console.log('Valores inválidos na duração:', minutes, seconds);
         return 0;
       }
       
-      return minutes * 60 + seconds;
+      const totalSeconds = minutes * 60 + seconds;
+      console.log('Duração parseada com sucesso:', cleanDuration, '→', totalSeconds, 'segundos');
+      return totalSeconds;
     }
   } catch (error) {
-    console.error('Erro ao analisar duração:', error);
+    console.error('Erro ao analisar duração:', duration, error);
   }
   
   return 0;
