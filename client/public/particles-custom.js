@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Criar o canvas com opacidade ajustada
+  // Criar o canvas com opacidade aumentada para melhor visibilidade
   const canvas = document.createElement('canvas');
   canvas.id = 'particles-canvas';
-  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.3;';
+  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.5;';
   
   // Inserir no DOM
   document.body.insertBefore(canvas, document.getElementById('root'));
@@ -19,11 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   
-  // Rastrear posição do mouse
+  // Rastrear posição do mouse - também como uma partícula virtual
   const mouse = {
     x: undefined,
     y: undefined,
-    radius: 150
+    radius: 180, // Aumentado para interagir com mais partículas
+    isActive: false // Indica se o mouse está ativo na página
   };
   
   // Configurações das partículas
@@ -47,17 +48,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ordenar partículas por distância para formar triângulos com as mais próximas
     const triangles = [];
     
+    // Incluir o mouse como um ponto adicional se estiver ativo
+    const allPoints = [...particles];
+    
+    // Adicionar o mouse como um ponto se estiver visível na tela
+    if (mouse.x !== undefined && mouse.y !== undefined) {
+      mouse.isActive = true;
+      // Não adiciona o mouse diretamente na lista de partículas para não afetar outros cálculos
+    } else {
+      mouse.isActive = false;
+    }
+    
     // Para cada partícula, encontrar as duas partículas mais próximas para formar um triângulo
     for (let i = 0; i < particles.length; i++) {
       const distances = [];
       
+      // Calcular distâncias para outras partículas
       for (let j = 0; j < particles.length; j++) {
         if (i !== j) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
           
-          distances.push({ index: j, distance: distance });
+          distances.push({ index: j, distance: distance, isMouse: false });
+        }
+      }
+      
+      // Também calcular distância para o mouse se estiver ativo
+      if (mouse.isActive) {
+        const dx = particles[i].x - mouse.x;
+        const dy = particles[i].y - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Apenas considerar se estiver dentro do raio do mouse
+        if (distance < mouse.radius) {
+          distances.push({ index: -1, distance: distance, isMouse: true });
         }
       }
       
@@ -66,21 +91,56 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Pegar as duas partículas mais próximas para formar um triângulo
       if (distances.length >= 2) {
-        const j = distances[0].index;
-        const k = distances[1].index;
+        const point1 = distances[0];
+        const point2 = distances[1];
         
-        // Criar um ID único para o triângulo (ordenando os índices)
-        const triangleId = [i, j, k].sort().join('-');
+        // Criar um triângulo com estas partículas
+        let trianglePoints = [
+          { x: particles[i].x, y: particles[i].y }
+        ];
+        
+        // Adicionar segundo ponto (pode ser mouse ou partícula)
+        if (point1.isMouse) {
+          trianglePoints.push({ x: mouse.x, y: mouse.y });
+        } else {
+          trianglePoints.push({ x: particles[point1.index].x, y: particles[point1.index].y });
+        }
+        
+        // Adicionar terceiro ponto (pode ser mouse ou partícula)
+        if (point2.isMouse) {
+          trianglePoints.push({ x: mouse.x, y: mouse.y });
+        } else {
+          trianglePoints.push({ x: particles[point2.index].x, y: particles[point2.index].y });
+        }
+        
+        // Criar ID único para o triângulo
+        let idParts = [];
+        
+        // Partícula atual
+        idParts.push(`p${i}`);
+        
+        // Segundo ponto
+        if (point1.isMouse) {
+          idParts.push('mouse');
+        } else {
+          idParts.push(`p${point1.index}`);
+        }
+        
+        // Terceiro ponto
+        if (point2.isMouse) {
+          idParts.push('mouse');
+        } else {
+          idParts.push(`p${point2.index}`);
+        }
+        
+        const triangleId = idParts.sort().join('-');
         
         // Apenas adicionar se este triângulo ainda não foi adicionado
         if (!triangles.some(t => t.id === triangleId)) {
           triangles.push({
             id: triangleId,
-            points: [
-              { x: particles[i].x, y: particles[i].y },
-              { x: particles[j].x, y: particles[j].y },
-              { x: particles[k].x, y: particles[k].y }
-            ]
+            points: trianglePoints,
+            hasMouse: point1.isMouse || point2.isMouse
           });
         }
       }
@@ -94,8 +154,14 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.lineTo(t.points[2].x, t.points[2].y);
       ctx.closePath();
       
-      // Desenhar apenas contorno do triângulo (para ser mais leve)
-      ctx.strokeStyle = 'rgba(0, 204, 255, 0.15)';
+      // Desenhar contorno do triângulo com mais visibilidade
+      // Triângulos conectados ao mouse ficam mais brilhantes
+      if (t.hasMouse) {
+        ctx.strokeStyle = 'rgba(0, 204, 255, 0.4)'; // Mais visível
+      } else {
+        ctx.strokeStyle = 'rgba(0, 204, 255, 0.25)'; // Visibilidade padrão
+      }
+      ctx.lineWidth = 0.75; // Linha mais grossa
       ctx.stroke();
     }
   }
@@ -105,16 +171,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Limpar canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Desenhar partículas
+    // Desenhar partículas com mais visibilidade
     ctx.fillStyle = '#00CCFF';
     
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       
-      // Desenhar partícula
+      // Desenhar partícula com tamanho ligeiramente maior e brilho
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.size * 1.2, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Adicionar brilho em volta para maior visibilidade
+      ctx.globalAlpha = 0.3;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
       
       // Mover partícula com velocidade 6x
       p.x += p.speedX;
