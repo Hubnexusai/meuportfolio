@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-// Componentes estilizados
+// Componentes estilizados otimizados - removendo efeitos visuais pesados
 const PlayerContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -9,6 +9,7 @@ const PlayerContainer = styled.div`
   gap: 0.5rem;
   max-width: 100%;
   width: 100%;
+  font-family: var(--font-body);
 `;
 
 const ControlsContainer = styled.div`
@@ -19,50 +20,37 @@ const ControlsContainer = styled.div`
 `;
 
 const PlayButton = styled.button`
-  background: linear-gradient(to right, #000935, #00CCFF);
+  background: #00CCFF;
   border: none;
   outline: none;
   color: white;
   cursor: pointer;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
   padding: 0;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  
-  &:hover {
-    transform: scale(1.1);
-  }
+  /* Removido efeito de transição e sombra para otimização */
 `;
 
 const ProgressBarContainer = styled.div`
   flex: 1;
-  height: 6px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  border-radius: 2px;
   position: relative;
   cursor: pointer;
 `;
 
 const Progress = styled.div<{ $width: string }>`
   height: 100%;
-  background: linear-gradient(to right, #000935, #00CCFF);
-  border-radius: 3px;
+  background: #00CCFF;
+  border-radius: 2px;
   width: ${props => props.$width};
-  transition: width 0.1s linear;
-`;
-
-const TimeDisplay = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  width: 100%;
+  /* Removido efeito de transição para otimização */
 `;
 
 const DurationLabel = styled.div`
@@ -70,12 +58,12 @@ const DurationLabel = styled.div`
   color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
   
   &:before {
     content: '\\f2f9';
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
+    margin-right: 4px;
   }
 `;
 
@@ -84,6 +72,7 @@ interface AudioPlayerProps {
   duration?: string;
 }
 
+// Função simplificada de formatação de tempo
 const formatTime = (timeInSeconds: number): string => {
   const minutes = Math.floor(timeInSeconds / 60);
   const seconds = Math.floor(timeInSeconds % 60);
@@ -109,33 +98,39 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   
+  // useEffect otimizado
   useEffect(() => {
-    // Criar elemento de áudio
-    const audio = new Audio(src);
-    audioRef.current = audio;
-    
-    // Event listeners
-    audio.addEventListener('loadedmetadata', () => {
-      setDurationInSeconds(audio.duration || parseDuration(duration));
-    });
-    
-    audio.addEventListener('timeupdate', () => {
-      setCurrentTime(audio.currentTime);
-    });
-    
-    audio.addEventListener('ended', () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    });
-    
-    // Cleanup na desmontagem do componente
-    return () => {
-      audio.pause();
-      audio.src = '';
+    // Usar elemento de áudio apenas uma vez
+    if (!audioRef.current) {
+      const audio = new Audio();
+      audioRef.current = audio;
       
-      audio.removeEventListener('loadedmetadata', () => {});
-      audio.removeEventListener('timeupdate', () => {});
-      audio.removeEventListener('ended', () => {});
+      // Event listeners
+      audio.addEventListener('loadedmetadata', () => {
+        setDurationInSeconds(audio.duration || parseDuration(duration));
+      });
+      
+      audio.addEventListener('timeupdate', () => {
+        setCurrentTime(audio.currentTime);
+      });
+      
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      });
+    }
+    
+    // Atualizar apenas a source
+    if (audioRef.current) {
+      audioRef.current.src = src;
+      audioRef.current.load();
+    }
+    
+    // Cleanup
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
     };
   }, [src, duration]);
   
@@ -175,7 +170,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => 
   
   return (
     <PlayerContainer>
-      <DurationLabel>Áudio: {formatTime(durationInSeconds)}</DurationLabel>
+      <DurationLabel>{formatTime(durationInSeconds)}</DurationLabel>
       
       <ControlsContainer>
         <PlayButton onClick={togglePlayPause}>
@@ -189,11 +184,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => 
           <Progress $width={progressPercentage} />
         </ProgressBarContainer>
       </ControlsContainer>
-      
-      <TimeDisplay>
-        <span>{formatTime(currentTime)}</span>
-        <span>{formatTime(durationInSeconds)}</span>
-      </TimeDisplay>
     </PlayerContainer>
   );
 };

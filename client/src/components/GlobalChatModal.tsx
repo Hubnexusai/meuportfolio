@@ -92,26 +92,15 @@ export function useChatModal() {
   };
 }
 
-// Componentes UI para o modal
+// Animações simplificadas para melhorar performance
 const zoomInBounce = keyframes`
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
+  0%, 100% {
     opacity: 1;
   }
 `;
 
 const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
+  0%, 100% {
     opacity: 1;
   }
 `;
@@ -143,12 +132,10 @@ const ModalContainer = styled.div`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  /* Removido box-shadow para melhorar performance */
   border: 1px solid rgba(0, 204, 255, 0.3);
   
-  &.zoom-in-bounce {
-    animation: ${zoomInBounce} 0.4s ease-out;
-  }
+  /* Animação removida para melhorar performance */
 `;
 
 const ModalHeader = styled.div`
@@ -250,28 +237,18 @@ const MessageWrapper = styled.div<{ $isUser: boolean }>`
 const BubbleContainer = styled.div<{ $isUser: boolean }>`
   width: 100%;
   padding: 0.75rem 1rem;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   background: ${props => props.$isUser 
-    ? 'linear-gradient(to right, #000935, #00CCFF)' 
+    ? '#00CCFF' 
     : 'rgba(45, 55, 72, 0.7)'};
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Removido o box-shadow para melhorar performance */
   position: relative;
   font-family: var(--font-body);
   font-size: 1rem;
   line-height: 1.5;
   
-  &:after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    border: 0.5rem solid transparent;
-    ${props => props.$isUser 
-      ? 'border-left-color: #00CCFF; right: -0.75rem; top: 1rem;'
-      : 'border-right-color: rgba(45, 55, 72, 0.7); left: -0.75rem; top: 1rem;'
-    }
-  }
+  /* Removido pseudo-elemento de seta para melhorar performance */
 `;
 
 const MessageTime = styled.span`
