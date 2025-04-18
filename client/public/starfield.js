@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const line = document.createElement('div');
         line.className = 'neural-line';
         
-        // Estilo da linha
+        // Estilo da linha - aumentada opacidade
         line.style.position = 'absolute';
         line.style.height = '1px';
-        line.style.backgroundColor = 'rgba(0, 204, 255, 0.2)';
+        line.style.backgroundColor = 'rgba(0, 204, 255, 0.5)';
         line.style.transformOrigin = 'left center';
         
         // Calcular a posição e tamanho da linha
@@ -74,12 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  // Adicionar estilos para animação de pulsar
+  // Adicionar estilos para animação de pulsar - mais visível
   const style = document.createElement('style');
   style.textContent = `
     @keyframes pulse {
-      0% { opacity: 0.3; }
-      100% { opacity: 0.7; }
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    
+    .neural-point {
+      box-shadow: 0 0 5px #00CCFF;
     }
   `;
   document.head.appendChild(style);

@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Criar o canvas
+  // Criar o canvas com maior opacidade
   const canvas = document.createElement('canvas');
   canvas.id = 'matrix-canvas';
-  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.15;';
+  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.4;';
   
   // Inserir no DOM
   document.body.insertBefore(canvas, document.getElementById('root'));
@@ -28,18 +28,20 @@ document.addEventListener('DOMContentLoaded', function() {
     drops[i] = Math.random() * -canvas.height;
   }
   
-  // Caracteres do efeito Matrix (simplificado para melhor performance)
-  const chars = ['0', '1', 'A', 'I'];
+  // Caracteres do efeito Matrix (expandido para ser mais visível)
+  const chars = ['0', '1', 'A', 'I', 'H', 'U', 'B', 'N', 'X', 'S'];
   
-  // Função de desenho
+  // Função de desenho - melhorada visibilidade
   function draw() {
     // Fundo semi-transparente para criar rastro
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Cor dos caracteres
+    // Cor dos caracteres - mais brilhante
     ctx.fillStyle = '#00CCFF';
-    ctx.font = '16px monospace';
+    ctx.font = 'bold 18px monospace';
+    ctx.shadowColor = '#00CCFF';
+    ctx.shadowBlur = 5;
     
     // Desenha os caracteres
     for (let i = 0; i < columns; i++) {

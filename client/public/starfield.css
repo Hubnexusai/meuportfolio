@@ -32,10 +32,10 @@
 @keyframes twinkle {
   0% {
     opacity: 0.2;
-    /* Removido o box-shadow para melhorar performance */
+    box-shadow: 0 0 4px #00CCFF;
   }
   100% {
     opacity: 0.8;
-    /* Removido o box-shadow para melhorar performance */
+    box-shadow: 0 0 8px #00CCFF;
   }
 }
