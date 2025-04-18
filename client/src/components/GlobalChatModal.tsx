@@ -354,8 +354,9 @@ const RecordingTime = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.75rem;
-  background: rgba(239, 68, 68, 0.2);
+  padding: 0.3rem 0.8rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 1rem;
   color: #ef4444;
   position: absolute;
@@ -364,12 +365,7 @@ const RecordingTime = styled.div`
   transform: translateX(-50%);
   font-size: 0.875rem;
   font-weight: bold;
-  
-  &:before {
-    content: '●';
-    margin-right: 0.25rem;
-    /* Animação de piscar removida para melhorar performance */
-  }
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 // Interface para as mensagens
@@ -853,12 +849,12 @@ const GlobalChatModal: React.FC = () => {
     }
     
     // Adiciona mensagem do usuário (áudio) - garantir que a duração seja válida
-    // Usar o tempo formatado para garantir consistência
-    console.log('Enviando áudio com duração registrada:', formattedTime);
+    // Usar a duração final formatada para garantir consistência
+    console.log('Enviando áudio com duração registrada:', formattedFinalDuration);
     
     const newUserMessage: Message = {
       id: messageIdCounter.current++,
-      text: `data:audio/webm;base64,${audioBase64}|duration:${formattedTime}`,
+      text: `data:audio/webm;base64,${audioBase64}|duration:${formattedFinalDuration}`,
       isUser: true,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       createdAt: Date.now(),
@@ -1146,13 +1142,13 @@ const GlobalChatModal: React.FC = () => {
         <InputArea>
           {isRecording && (
             <RecordingTime>
-              {formattedTime}
+              <span className="recording-blink">●</span> Gravando: {formattedTime}
             </RecordingTime>
           )}
           
           <ChatInput
             type="text"
-            placeholder="Digite sua mensagem..."
+            placeholder={isRecording ? "Gravando áudio..." : "Digite sua mensagem..."}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}

@@ -37,3 +37,17 @@
   /* Efeito removido para otimização */
   opacity: 1;
 }
+
+/* Animação para o indicador de gravação */
+.recording-blink {
+  color: #f44336;
+  animation: blink 1s infinite;
+  font-size: 0.8rem;
+  margin-right: 4px;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
