@@ -240,6 +240,7 @@ const MessageWrapper = styled.div<{ $isUser: boolean }>`
   max-width: 85%;
   margin-bottom: 1.5rem;
   position: relative;
+  font-family: var(--font-body);
   
   &.zoom-in-bounce {
     animation: ${zoomInBounce} 0.4s ease-out;
@@ -256,6 +257,9 @@ const BubbleContainer = styled.div<{ $isUser: boolean }>`
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
   
   &:after {
     content: '';
@@ -279,6 +283,7 @@ const MessageTime = styled.span`
   background: rgba(0, 0, 0, 0.3);
   padding: 0.1rem 0.4rem;
   border-radius: 0.3rem;
+  font-family: var(--font-body);
 `;
 
 const InputArea = styled.div`
@@ -334,6 +339,7 @@ const SendButton = styled.button<{ disabled?: boolean }>`
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.875rem;
+  font-family: var(--font-body);
   width: 48%;
   
   &:hover:not(:disabled) {
@@ -346,10 +352,13 @@ const SendButton = styled.button<{ disabled?: boolean }>`
   }
 `;
 
-const RecordButton = styled.button<{ $isRecording: boolean }>`
-  background: ${props => props.$isRecording 
-    ? 'linear-gradient(to right, #ef4444, #f87171)' 
-    : 'linear-gradient(to right, #000935, #00CCFF)'};
+const RecordButton = styled.button<{ $isRecording: boolean; disabled?: boolean }>`
+  background: ${props => {
+    if (props.disabled) return 'rgba(30, 41, 59, 0.7)';
+    return props.$isRecording 
+      ? 'linear-gradient(to right, #ef4444, #f87171)' 
+      : 'linear-gradient(to right, #000935, #00CCFF)';
+  }};
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -358,12 +367,14 @@ const RecordButton = styled.button<{ $isRecording: boolean }>`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  cursor: pointer;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   transition: all 0.3s ease;
   font-size: 0.875rem;
+  font-family: var(--font-body);
   width: 48%;
+  opacity: ${props => props.disabled ? 0.5 : 1};
   
-  &:hover {
+  &:hover:not(:disabled) {
     transform: scale(1.05);
   }
 `;
@@ -1133,9 +1144,20 @@ const GlobalChatModal: React.FC = () => {
             <RecordButton 
               onClick={isRecording ? discardRecording : startRecording}
               $isRecording={isRecording}
-              title={isRecording ? "Descartar gravação" : "Gravar áudio"}
+              disabled={!isRecording && infoCollectionStep !== 'complete'}
+              title={isRecording 
+                ? "Descartar gravação" 
+                : infoCollectionStep !== 'complete' 
+                  ? "Complete seus dados para gravar áudio" 
+                  : "Gravar áudio"
+              }
             >
               {isRecording ? "Cancelar" : "Gravar áudio"}
+              {!isRecording && infoCollectionStep !== 'complete' && 
+                <span style={{ fontSize: '0.65rem', display: 'block', marginTop: '0.2rem', opacity: 0.8 }}>
+                  (Complete seus dados)
+                </span>
+              }
             </RecordButton>
             
             {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
