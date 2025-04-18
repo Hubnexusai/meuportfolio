@@ -399,68 +399,93 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
 
   console.log("Processando resposta webhook:", JSON.stringify(data));
   
-  // Caso 1: Resposta tem um campo 'output' (formato novo)
-  if (data && data.output && Array.isArray(data.output)) {
-    data.output.forEach((item: {message?: string, typeMessage?: string}) => {
-      if (item.message && item.message !== "Workflow was started") {
-        const messageType = item.typeMessage?.toLowerCase() || 'text';
-        messages.push({
-          id: messageIdCounter.current++,
-          text: item.message,
-          isUser: false,
-          time: currentTime,
-          createdAt: Date.now(),
-          type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
-        });
-      }
-    });
+  // Resposta vazia ou sem conteúdo (ignorar)
+  if (!data || data.code === 0 || (data.message === "No item to return got found")) {
+    console.log("Resposta webhook vazia ou sem conteúdo, ignorando");
+    return messages;
   }
-  // Caso 2: Resposta é um array com estrutura aninhada [{ output: [{ message, typeMessage }] }]
-  else if (Array.isArray(data)) {
-    data.forEach((outerItem: any) => {
-      // Verifica o formato com output aninhado
-      if (outerItem.output && Array.isArray(outerItem.output)) {
-        outerItem.output.forEach((item: {message?: string, typeMessage?: string}) => {
-          if (item.message && item.message !== "Workflow was started") {
-            const messageType = item.typeMessage?.toLowerCase() || 'text';
-            messages.push({
-              id: messageIdCounter.current++,
-              text: item.message,
-              isUser: false,
-              time: currentTime,
-              createdAt: Date.now(),
-              type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
-            });
+  
+  // Padrão 1: Resposta simples sem mensagem (ignorar)
+  if (data && typeof data === 'object' && Object.keys(data).length === 0) {
+    return messages;
+  }
+  
+  try {
+    // Caso 1: Resposta tem um campo 'output' (formato novo)
+    if (data && data.output && Array.isArray(data.output)) {
+      // Processa apenas o primeiro item relevante do output
+      for (const item of data.output) {
+        if (item.message && item.message !== "Workflow was started") {
+          const messageType = item.typeMessage?.toLowerCase() || 'text';
+          messages.push({
+            id: messageIdCounter.current++,
+            text: item.message,
+            isUser: false,
+            time: currentTime,
+            createdAt: Date.now(),
+            type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+          });
+          break; // Só processa o primeiro item válido
+        }
+      }
+    }
+    // Caso 2: Resposta é um array 
+    else if (Array.isArray(data)) {
+      // Processa apenas o primeiro item relevante do array
+      for (const outerItem of data) {
+        let messageAdded = false;
+        
+        // Verifica o formato com output aninhado
+        if (outerItem.output && Array.isArray(outerItem.output)) {
+          for (const item of outerItem.output) {
+            if (item.message && item.message !== "Workflow was started") {
+              const messageType = item.typeMessage?.toLowerCase() || 'text';
+              messages.push({
+                id: messageIdCounter.current++,
+                text: item.message,
+                isUser: false,
+                time: currentTime,
+                createdAt: Date.now(),
+                type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+              });
+              messageAdded = true;
+              break; // Só processa o primeiro item válido
+            }
           }
-        });
-      } 
-      // Formato alternativo: array de mensagens diretas [{ message, typeMessage }]
-      else if (outerItem.message && outerItem.message !== "Workflow was started") {
-        const messageType = outerItem.typeMessage?.toLowerCase() || 'text';
+        } 
+        // Formato alternativo: array de mensagens diretas [{ message, typeMessage }]
+        else if (outerItem.message && outerItem.message !== "Workflow was started") {
+          const messageType = outerItem.typeMessage?.toLowerCase() || 'text';
+          messages.push({
+            id: messageIdCounter.current++,
+            text: outerItem.message,
+            isUser: false,
+            time: currentTime,
+            createdAt: Date.now(),
+            type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+          });
+          messageAdded = true;
+        }
+        
+        if (messageAdded) break; // Se alguma mensagem foi adicionada, não processa mais itens
+      }
+    } 
+    // Caso 3: Resposta é um objeto com message ou messages
+    else if (data) {
+      const responseText = data.messages || data.message;
+      if (responseText && responseText !== "Workflow was started") {
         messages.push({
           id: messageIdCounter.current++,
-          text: outerItem.message,
+          text: responseText,
           isUser: false,
           time: currentTime,
           createdAt: Date.now(),
-          type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
+          type: 'text'
         });
       }
-    });
-  } 
-  // Caso 3: Resposta é um objeto com message ou messages
-  else if (data) {
-    const responseText = data.messages || data.message;
-    if (responseText && responseText !== "Workflow was started") {
-      messages.push({
-        id: messageIdCounter.current++,
-        text: responseText,
-        isUser: false,
-        time: currentTime,
-        createdAt: Date.now(),
-        type: 'text'
-      });
     }
+  } catch (error) {
+    console.error("Erro ao processar resposta do webhook:", error);
   }
   
   return messages;
