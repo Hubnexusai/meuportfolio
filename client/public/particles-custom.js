@@ -1,4 +1,4 @@
-// Efeito de partículas ultra-otimizado para Hub Nexus AI
+// Efeito de partículas triangulares com interação do mouse (velocidade 6x)
 document.addEventListener('DOMContentLoaded', function() {
   // Verificação de suporte a canvas
   if (!window.HTMLCanvasElement) {
@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Criar o canvas com opacidade muito reduzida
+  // Criar o canvas com opacidade ajustada
   const canvas = document.createElement('canvas');
   canvas.id = 'particles-canvas';
-  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.25;';
+  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.3;';
   
   // Inserir no DOM
   document.body.insertBefore(canvas, document.getElementById('root'));
@@ -19,20 +19,85 @@ document.addEventListener('DOMContentLoaded', function() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   
-  // Configurações das partículas - apenas 8 partículas para máxima performance
-  const particleCount = 8;
+  // Rastrear posição do mouse
+  const mouse = {
+    x: undefined,
+    y: undefined,
+    radius: 150
+  };
+  
+  // Configurações das partículas
+  const particleCount = 12; // Um pouco mais para garantir formação de triângulos
   const particles = [];
   
-  // Criar as partículas com velocidade 4x
+  // Criar as partículas com velocidade 6x
   for (let i = 0; i < particleCount; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      size: Math.random() * 2.5 + 1,
-      // Velocidade 4x mais rápida que a normal
-      speedX: (Math.random() * 0.5 - 0.25) * 4,
-      speedY: (Math.random() * 0.5 - 0.25) * 4
+      size: Math.random() * 2 + 1,
+      // Velocidade 6x mais rápida
+      speedX: (Math.random() * 0.5 - 0.25) * 6,
+      speedY: (Math.random() * 0.5 - 0.25) * 6
     });
+  }
+  
+  // Função para desenhar triângulos entre partículas
+  function drawTriangles() {
+    // Ordenar partículas por distância para formar triângulos com as mais próximas
+    const triangles = [];
+    
+    // Para cada partícula, encontrar as duas partículas mais próximas para formar um triângulo
+    for (let i = 0; i < particles.length; i++) {
+      const distances = [];
+      
+      for (let j = 0; j < particles.length; j++) {
+        if (i !== j) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          distances.push({ index: j, distance: distance });
+        }
+      }
+      
+      // Ordenar por distância (mais próximas primeiro)
+      distances.sort((a, b) => a.distance - b.distance);
+      
+      // Pegar as duas partículas mais próximas para formar um triângulo
+      if (distances.length >= 2) {
+        const j = distances[0].index;
+        const k = distances[1].index;
+        
+        // Criar um ID único para o triângulo (ordenando os índices)
+        const triangleId = [i, j, k].sort().join('-');
+        
+        // Apenas adicionar se este triângulo ainda não foi adicionado
+        if (!triangles.some(t => t.id === triangleId)) {
+          triangles.push({
+            id: triangleId,
+            points: [
+              { x: particles[i].x, y: particles[i].y },
+              { x: particles[j].x, y: particles[j].y },
+              { x: particles[k].x, y: particles[k].y }
+            ]
+          });
+        }
+      }
+    }
+    
+    // Desenhar os triângulos
+    for (let t of triangles) {
+      ctx.beginPath();
+      ctx.moveTo(t.points[0].x, t.points[0].y);
+      ctx.lineTo(t.points[1].x, t.points[1].y);
+      ctx.lineTo(t.points[2].x, t.points[2].y);
+      ctx.closePath();
+      
+      // Desenhar apenas contorno do triângulo (para ser mais leve)
+      ctx.strokeStyle = 'rgba(0, 204, 255, 0.15)';
+      ctx.stroke();
+    }
   }
   
   // Função de desenho otimizada
@@ -40,60 +105,76 @@ document.addEventListener('DOMContentLoaded', function() {
     // Limpar canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Desenhar partículas - sem shadow para melhorar performance
+    // Desenhar partículas
     ctx.fillStyle = '#00CCFF';
     
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       
-      // Desenhar partícula simples sem efeitos
+      // Desenhar partícula
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
       
-      // Mover partícula com velocidade 4x
+      // Mover partícula com velocidade 6x
       p.x += p.speedX;
       p.y += p.speedY;
+      
+      // Interação com o mouse - muda direção quando próximo ao mouse
+      if (mouse.x !== undefined && mouse.y !== undefined) {
+        const dx = p.x - mouse.x;
+        const dy = p.y - mouse.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Se a partícula estiver próxima ao mouse
+        if (distance < mouse.radius) {
+          // Cria uma força de atração leve em direção ao mouse
+          const forceDirectionX = dx / distance;
+          const forceDirectionY = dy / distance;
+          const force = (mouse.radius - distance) / mouse.radius;
+          
+          // Ajusta a velocidade com base na força
+          p.speedX += forceDirectionX * force * 0.5;
+          p.speedY += forceDirectionY * force * 0.5;
+          
+          // Limita a velocidade máxima para evitar comportamentos estranhos
+          const maxSpeed = 4;
+          const currentSpeed = Math.sqrt(p.speedX * p.speedX + p.speedY * p.speedY);
+          if (currentSpeed > maxSpeed) {
+            p.speedX = (p.speedX / currentSpeed) * maxSpeed;
+            p.speedY = (p.speedY / currentSpeed) * maxSpeed;
+          }
+        }
+      }
       
       // Verificar bordas com bounce
       if (p.x < 0 || p.x > canvas.width) {
         p.speedX *= -1;
-        // Garantir que não fique preso na borda
         p.x = p.x < 0 ? 0 : canvas.width;
       }
       if (p.y < 0 || p.y > canvas.height) {
         p.speedY *= -1;
-        // Garantir que não fique preso na borda
         p.y = p.y < 0 ? 0 : canvas.height;
       }
     }
     
-    // Adicionar linhas entre partículas próximas (opcional, mas otimizado)
-    ctx.strokeStyle = 'rgba(0, 204, 255, 0.15)';
-    ctx.lineWidth = 0.5;
-    
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Conectar apenas partículas muito próximas
-        if (distance < canvas.width / 10) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          
-          // Opacidade baseada na distância para efeito de desvanecimento
-          ctx.globalAlpha = 1 - (distance / (canvas.width / 10));
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-        }
-      }
-    }
+    // Desenhar triângulos entre as partículas
+    drawTriangles();
   }
   
-  // Configurar intervalo para animação - 60 fps para movimento suave
+  // Atualizar posição do mouse
+  document.addEventListener('mousemove', function(e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+  
+  // Resetar posição do mouse quando sair da página
+  document.addEventListener('mouseout', function() {
+    mouse.x = undefined;
+    mouse.y = undefined;
+  });
+  
+  // Configurar intervalo para animação (60 fps)
   setInterval(draw, 16);
   
   // Redimensionar canvas quando a janela mudar de tamanho
@@ -102,5 +183,5 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.height = window.innerHeight;
   }, { passive: true });
   
-  console.log('Efeito de partículas 4x velocidade inicializado');
+  console.log('Efeito de partículas triangulares 6x velocidade inicializado');
 });
