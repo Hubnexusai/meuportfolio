@@ -673,6 +673,14 @@ const GlobalChatModal: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   
+  // Estados para informações do usuário
+  const [userName, setUserName] = useState<string>('');
+  const [userWhatsapp, setUserWhatsapp] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
+  
+  // Estado para controlar o fluxo de coleta de informações
+  const [infoCollectionStep, setInfoCollectionStep] = useState<'none' | 'name' | 'whatsapp' | 'email' | 'complete'>('none');
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageIdCounter = useRef(2);
   
@@ -708,10 +716,16 @@ const GlobalChatModal: React.FC = () => {
       messageIdCounter.current = 1;
       setWelcomeMessageShown(false);
       
-      // Adiciona uma única mensagem de boas-vindas
+      // Reseta as informações do usuário e volta para o primeiro passo de coleta
+      setUserName('');
+      setUserWhatsapp('');
+      setUserEmail('');
+      setInfoCollectionStep('name');
+      
+      // Adiciona uma mensagem de boas-vindas e solicita o nome
       const welcomeMessage: Message = {
         id: messageIdCounter.current++,
-        text: `Olá, você está no ${agentName}.`,
+        text: `Olá, você está no ${agentName}. Por favor, me informe seu nome:`,
         isUser: false,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         createdAt: Date.now(),
@@ -770,6 +784,21 @@ const GlobalChatModal: React.FC = () => {
   const handleSendAudio = () => {
     if (!audioBase64) return;
     
+    // Não permitir envio de áudio até que todas as informações sejam coletadas
+    if (infoCollectionStep !== 'complete') {
+      // Adicione uma mensagem informando que a coleta de dados precisa ser concluída
+      const errorMessage: Message = {
+        id: messageIdCounter.current++,
+        text: 'Por favor, primeiro forneça as informações solicitadas antes de enviar áudio.',
+        isUser: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now(),
+        type: 'text'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+    
     // Adiciona mensagem do usuário (áudio) com a duração
     const newUserMessage: Message = {
       id: messageIdCounter.current++,
@@ -785,12 +814,15 @@ const GlobalChatModal: React.FC = () => {
     // Ativa o indicador de digitação
     setIsTyping(true);
     
-    // Prepara o payload para o webhook
+    // Prepara o payload para o webhook com as informações do usuário
     const webhookPayload = {
       agent: slugifyAgentName(agentName),
       message: audioBase64,
       typeMessage: "audio",
-      sessionId: sessionId
+      sessionId: sessionId,
+      nome: userName,
+      whatsapp: userWhatsapp,
+      email: userEmail
     };
     
     // Envia requisição HTTP POST para o webhook
@@ -856,15 +888,100 @@ const GlobalChatModal: React.FC = () => {
     
     setMessages(prev => [...prev, newUserMessage]);
     
+    // Processa a coleta de informações do usuário
+    if (infoCollectionStep === 'name') {
+      // Armazena o nome
+      setUserName(inputValue.trim());
+      
+      // Passa para o próximo passo (WhatsApp)
+      setInfoCollectionStep('whatsapp');
+      
+      // Adiciona uma mensagem solicitando o WhatsApp
+      const whatsappRequestMessage: Message = {
+        id: messageIdCounter.current++,
+        text: 'Obrigado! Agora, por favor, me informe seu WhatsApp (com DDD):',
+        isUser: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now(),
+        type: 'text'
+      };
+      
+      setTimeout(() => {
+        setMessages(prev => [...prev, whatsappRequestMessage]);
+      }, 500);
+      
+      setInputValue('');
+      return;
+    }
+    
+    if (infoCollectionStep === 'whatsapp') {
+      // Armazena o WhatsApp
+      setUserWhatsapp(inputValue.trim());
+      
+      // Passa para o próximo passo (email)
+      setInfoCollectionStep('email');
+      
+      // Adiciona uma mensagem solicitando o email
+      const emailRequestMessage: Message = {
+        id: messageIdCounter.current++,
+        text: 'Perfeito! Por último, me informe seu e-mail:',
+        isUser: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now(),
+        type: 'text'
+      };
+      
+      setTimeout(() => {
+        setMessages(prev => [...prev, emailRequestMessage]);
+      }, 500);
+      
+      setInputValue('');
+      return;
+    }
+    
+    if (infoCollectionStep === 'email') {
+      // Armazena o email
+      setUserEmail(inputValue.trim());
+      
+      // Marca a coleta de informações como concluída
+      setInfoCollectionStep('complete');
+      
+      // Adiciona uma mensagem de informações coletadas
+      const collectionCompleteMessage: Message = {
+        id: messageIdCounter.current++,
+        text: 'Obrigado por fornecer suas informações! Agora podemos prosseguir com a conversa.',
+        isUser: false,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now(),
+        type: 'text'
+      };
+      
+      setTimeout(() => {
+        setMessages(prev => [...prev, collectionCompleteMessage]);
+      }, 500);
+      
+      setInputValue('');
+      return;
+    }
+    
+    // A partir daqui, só executa se já tivermos coletado todas as informações
+    if (infoCollectionStep !== 'complete') {
+      setInputValue('');
+      return;
+    }
+    
     // Ativa o indicador de digitação
     setIsTyping(true);
     
-    // Prepara o formato do payload para o webhook
+    // Prepara o formato do payload para o webhook com as informações do usuário
     const webhookPayload = {
       agent: slugifyAgentName(agentName),
       message: inputValue,
       typeMessage: "text",
-      sessionId: sessionId
+      sessionId: sessionId,
+      nome: userName,
+      whatsapp: userWhatsapp,
+      email: userEmail
     };
     
     // Envia requisição HTTP POST para o webhook
