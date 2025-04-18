@@ -1,15 +1,15 @@
-// Efeito Matrix Digital Rain otimizado para Hub Nexus AI
+// Partículas simples para Hub Nexus AI
 document.addEventListener('DOMContentLoaded', function() {
-  // Verificação de suporte a canvas para dispositivos mais antigos
+  // Verificação de suporte a canvas
   if (!window.HTMLCanvasElement) {
-    console.log('Canvas não suportado, efeito Matrix desativado');
+    console.log('Canvas não suportado, efeito desativado');
     return;
   }
   
-  // Criar o canvas com maior opacidade
+  // Criar o canvas com opacidade reduzida
   const canvas = document.createElement('canvas');
-  canvas.id = 'matrix-canvas';
-  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.4;';
+  canvas.id = 'particles-canvas';
+  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.2;';
   
   // Inserir no DOM
   document.body.insertBefore(canvas, document.getElementById('root'));
@@ -19,66 +19,57 @@ document.addEventListener('DOMContentLoaded', function() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   
-  // Configurações do efeito Matrix
-  const columns = Math.floor(canvas.width / 20); // Menor número de colunas para melhor performance
-  const drops = [];
+  // Configurações das partículas
+  const particleCount = 20;
+  const particles = [];
   
-  // Inicializa posições das gotas
-  for (let i = 0; i < columns; i++) {
-    drops[i] = Math.random() * -canvas.height;
+  // Criar as partículas
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      size: Math.random() * 3 + 1,
+      speedX: Math.random() * 0.5 - 0.25,
+      speedY: Math.random() * 0.5 - 0.25
+    });
   }
   
-  // Caracteres do efeito Matrix (expandido para ser mais visível)
-  const chars = ['0', '1', 'A', 'I', 'H', 'U', 'B', 'N', 'X', 'S'];
-  
-  // Função de desenho - melhorada visibilidade
+  // Função de desenho
   function draw() {
-    // Fundo semi-transparente para criar rastro
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Limpar canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Cor dos caracteres - mais brilhante
+    // Desenhar partículas
     ctx.fillStyle = '#00CCFF';
-    ctx.font = 'bold 18px monospace';
     ctx.shadowColor = '#00CCFF';
     ctx.shadowBlur = 5;
     
-    // Desenha os caracteres
-    for (let i = 0; i < columns; i++) {
-      if (Math.random() > 0.985) { // Menor probabilidade de atualização para melhor performance
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        const x = i * 20;
-        const y = drops[i];
-        
-        ctx.fillText(char, x, y);
-        
-        // Se a gota chegar ao fim da tela, resetar para o topo
-        if (y > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        
-        // Move a gota para baixo
-        drops[i] += 10;
-      }
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      
+      // Desenhar partícula
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Mover partícula
+      p.x += p.speedX;
+      p.y += p.speedY;
+      
+      // Verificar bordas
+      if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
     }
   }
   
-  // Configurar intervalo mais lento para melhor performance (menos FPS)
-  setInterval(draw, 100);
+  // Configurar intervalo para animação
+  setInterval(draw, 50);
   
   // Redimensionar canvas quando a janela mudar de tamanho
   window.addEventListener('resize', function() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    // Recalcular colunas
-    const newColumns = Math.floor(canvas.width / 20);
-    // Ajustar o array de gotas se necessário
-    if (newColumns > columns) {
-      for (let i = columns; i < newColumns; i++) {
-        drops[i] = Math.random() * -canvas.height;
-      }
-    }
   }, { passive: true });
   
-  console.log('Efeito Matrix Digital Rain inicializado');
+  console.log('Efeito de partículas simples inicializado');
 });
