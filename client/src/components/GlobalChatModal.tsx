@@ -229,9 +229,7 @@ const MessageWrapper = styled.div<{ $isUser: boolean }>`
   position: relative;
   font-family: var(--font-body);
   
-  &.zoom-in-bounce {
-    animation: ${zoomInBounce} 0.4s ease-out;
-  }
+  /* Animação removida para melhorar performance */
 `;
 
 const BubbleContainer = styled.div<{ $isUser: boolean }>`
@@ -305,7 +303,7 @@ const ButtonsContainer = styled.div`
 const SendButton = styled.button<{ disabled?: boolean }>`
   background: ${props => props.disabled 
     ? 'rgba(30, 41, 59, 0.7)' 
-    : 'linear-gradient(to right, #000935, #00CCFF)'};
+    : '#00CCFF'};
   border: none;
   color: white;
   padding: 0.5rem 1rem;
@@ -314,14 +312,12 @@ const SendButton = styled.button<{ disabled?: boolean }>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  /* Transição removida para melhorar performance */
   font-size: 0.875rem;
   font-family: var(--font-body);
   width: 48%;
   
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-  }
+  /* Efeito de hover removido para melhorar performance */
   
   &:disabled {
     opacity: 0.5;
@@ -333,8 +329,8 @@ const RecordButton = styled.button<{ $isRecording: boolean; disabled?: boolean }
   background: ${props => {
     if (props.disabled) return 'rgba(30, 41, 59, 0.7)';
     return props.$isRecording 
-      ? 'linear-gradient(to right, #ef4444, #f87171)' 
-      : 'linear-gradient(to right, #000935, #00CCFF)';
+      ? '#ef4444' 
+      : '#00CCFF';
   }};
   border: none;
   color: white;
@@ -345,15 +341,13 @@ const RecordButton = styled.button<{ $isRecording: boolean; disabled?: boolean }
   justify-content: center;
   gap: 0.5rem;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.3s ease;
+  /* Transição removida para melhorar performance */
   font-size: 0.875rem;
   font-family: var(--font-body);
   width: 48%;
   opacity: ${props => props.disabled ? 0.5 : 1};
   
-  &:hover:not(:disabled) {
-    transform: scale(1.05);
-  }
+  /* Efeito de hover removido para melhorar performance */
 `;
 
 const RecordingTime = styled.div`
@@ -374,12 +368,7 @@ const RecordingTime = styled.div`
   &:before {
     content: '●';
     margin-right: 0.25rem;
-    animation: blink 1s infinite;
-  }
-  
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    /* Animação de piscar removida para melhorar performance */
   }
 `;
 

@@ -1,29 +1,29 @@
-// Custom Particles effect for Hub Nexus AI - Versão ultra otimizada
+// Partículas minimalistas para Hub Nexus AI - Versão extremamente otimizada
 document.addEventListener('DOMContentLoaded', function() {
-  // Create a canvas element for particles
+  // Verificação de suporte a canvas para dispositivos mais antigos
+  if (!window.HTMLCanvasElement) {
+    console.log('Canvas não suportado, partículas desativadas');
+    return;
+  }
+  
+  // Criar o canvas de forma otimizada
   const canvas = document.createElement('canvas');
   canvas.id = 'particles-canvas';
-  canvas.style.position = 'fixed';
-  canvas.style.top = '0';
-  canvas.style.left = '0';
-  canvas.style.width = '100%';
-  canvas.style.height = '100%';
-  canvas.style.zIndex = '1';
-  canvas.style.pointerEvents = 'none';
+  canvas.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:0.5;';
   
-  // Insert before the root div
-  const rootDiv = document.getElementById('root');
-  document.body.insertBefore(canvas, rootDiv);
+  // Inserir no DOM
+  document.body.insertBefore(canvas, document.getElementById('root'));
   
-  // Versão estática simples apenas com pontos fixos - sem animação
+  // Contexto 2D
   const ctx = canvas.getContext('2d');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   
-  // Desenhar pontos fixos de fundo - sem animação
+  // Desenhar apenas alguns pontos fixos
   ctx.fillStyle = '#00CCFF';
-  for (let i = 0; i < 15; i++) {
-    const size = Math.random() * 2 + 1;
+  for (let i = 0; i < 10; i++) {
+    // Partículas fixas sem animação (muito mais leve)
+    const size = Math.random() * 1.5 + 0.5;
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
     
@@ -32,5 +32,5 @@ document.addEventListener('DOMContentLoaded', function() {
     ctx.fill();
   }
   
-  console.log('Sistema de partículas otimizado inicializado');
+  console.log('Sistema de partículas minimalista inicializado');
 });

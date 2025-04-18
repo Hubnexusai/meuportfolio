@@ -5,11 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Reduzido drasticamente o número de estrelas
-  const STAR_COUNT = 40;
-  const COLORS = ['star-1', 'star-2', 'star-3'];
+  // Reduzido ainda mais o número de estrelas para melhorar performance
+  const STAR_COUNT = 25;
+  const COLORS = ['star-1', 'star-2'];
   
-  // Criar as estrelas - versão simplificada e otimizada
+  // Versão ultra simplificada para melhor performance
   for (let i = 0; i < STAR_COUNT; i++) {
     const star = document.createElement('div');
     const size = Math.random() * 2 + 1;
@@ -20,13 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
     star.style.top = `${Math.random() * 100}%`;
     star.style.width = `${size}px`;
     star.style.height = `${size}px`;
-    // Animação mais lenta para melhor performance
-    star.style.setProperty('--duration', `${Math.random() * 6 + 3}s`);
+    // Aumentado tempo de animação para reduzir carga no CPU
+    star.style.setProperty('--duration', `${Math.random() * 8 + 6}s`);
     
     starfield.appendChild(star);
   }
   
-  // Removemos completamente as linhas de mouse para melhorar performance
+  // Removido completamente qualquer interação com o mouse
   
-  console.log('Starfield otimizado inicializado com sucesso');
+  console.log('Starfield ultra otimizado inicializado com sucesso');
 });
