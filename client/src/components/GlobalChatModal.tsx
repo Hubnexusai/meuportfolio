@@ -497,15 +497,32 @@ const AudioContainer = styled.div`
 const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   // Para áudio, extrai a URL base64 e a duração
   if (message.type === 'audio' && message.text.includes('data:audio')) {
-    const parts = message.text.split('|');
-    const audioUrl = parts[0];
-    const duration = parts[1]?.split(':')[1] || '00:00';
-    
-    return (
-      <AudioContainer>
-        <AudioPlayer src={audioUrl} duration={duration} />
-      </AudioContainer>
-    );
+    try {
+      const parts = message.text.split('|');
+      const audioUrl = parts[0];
+      
+      // Garantir que a duração é válida para evitar "Infinity:NaN"
+      let duration = '0:00';
+      if (parts.length > 1 && parts[1]?.includes('duration:')) {
+        const durationPart = parts[1]?.split(':');
+        if (durationPart.length >= 2 && !isNaN(parseInt(durationPart[1]))) {
+          duration = durationPart[1] || '0:00';
+        }
+      }
+      
+      return (
+        <AudioContainer>
+          <AudioPlayer src={audioUrl} duration={duration} />
+        </AudioContainer>
+      );
+    } catch (error) {
+      console.error("Erro ao processar áudio:", error);
+      return (
+        <AudioContainer>
+          <AudioPlayer src={message.text} duration="0:00" />
+        </AudioContainer>
+      );
+    }
   }
 
   // Para imagens

@@ -81,12 +81,28 @@ const formatTime = (timeInSeconds: number): string => {
 
 // Parse a duração no formato "mm:ss" para segundos
 const parseDuration = (duration: string): number => {
-  const parts = duration.split(':');
-  if (parts.length === 2) {
-    const minutes = parseInt(parts[0], 10);
-    const seconds = parseInt(parts[1], 10);
-    return minutes * 60 + seconds;
+  // Verificar se a duração é válida
+  if (!duration || duration === 'undefined:undefined' || duration === 'NaN:NaN' || duration === 'Infinity:NaN') {
+    return 0;
   }
+  
+  try {
+    const parts = duration.split(':');
+    if (parts.length === 2) {
+      const minutes = parseInt(parts[0], 10);
+      const seconds = parseInt(parts[1], 10);
+      
+      // Verificar se os valores são números válidos
+      if (isNaN(minutes) || isNaN(seconds)) {
+        return 0;
+      }
+      
+      return minutes * 60 + seconds;
+    }
+  } catch (error) {
+    console.error('Erro ao analisar duração:', error);
+  }
+  
   return 0;
 };
 
