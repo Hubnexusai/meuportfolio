@@ -269,10 +269,13 @@ const BubbleContainer = styled.div<{ $isUser: boolean }>`
 
 const MessageTime = styled.span`
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
   position: absolute;
   right: 0;
-  bottom: -1.4rem;
+  bottom: -1.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.3rem;
 `;
 
 const InputArea = styled.div`
@@ -503,6 +506,14 @@ interface MessageContentProps {
   message: Message;
 }
 
+const AudioContainer = styled.div`
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  margin-top: 0.3rem;
+`;
+
 const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   // Para áudio, extrai a URL base64 e a duração
   if (message.type === 'audio' && message.text.includes('data:audio')) {
@@ -510,7 +521,11 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
     const audioUrl = parts[0];
     const duration = parts[1]?.split(':')[1] || '00:00';
     
-    return <AudioPlayer src={audioUrl} duration={duration} />;
+    return (
+      <AudioContainer>
+        <AudioPlayer src={audioUrl} duration={duration} />
+      </AudioContainer>
+    );
   }
 
   // Para imagens
