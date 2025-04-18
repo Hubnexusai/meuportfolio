@@ -31,15 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const particleCount = 14; // Aumentado para 14 conforme solicitado
   const particles = [];
   
-  // Criar as partículas com velocidade 6x e tamanho reduzido
+  // Criar as partículas com velocidade 4x e tamanho reduzido
   for (let i = 0; i < particleCount; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       size: Math.random() * 1.2 + 0.8, // Tamanho reduzido (entre 0.8 e 2.0)
-      // Velocidade 6x mais rápida
-      speedX: (Math.random() * 0.5 - 0.25) * 6,
-      speedY: (Math.random() * 0.5 - 0.25) * 6
+      // Velocidade 4x mais rápida (reduzida de 6x)
+      speedX: (Math.random() * 0.5 - 0.25) * 4,
+      speedY: (Math.random() * 0.5 - 0.25) * 4
     });
   }
   
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ctx.fill();
       ctx.globalAlpha = 1.0;
       
-      // Mover partícula com velocidade 6x
+      // Mover partícula com velocidade 4x
       p.x += p.speedX;
       p.y += p.speedY;
       
@@ -256,5 +256,5 @@ document.addEventListener('DOMContentLoaded', function() {
     canvas.height = window.innerHeight;
   }, { passive: true });
   
-  console.log('Efeito de partículas triangulares 6x velocidade inicializado');
+  console.log('Efeito de partículas triangulares 4x velocidade inicializado');
 });
