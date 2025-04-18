@@ -60,7 +60,7 @@ const DurationLabel = styled.div`
   align-items: center;
   
   &:before {
-    content: '\\f2f9';
+    content: '\\f017'; /* Ícone de relógio */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
     margin-right: 4px;
@@ -109,7 +109,14 @@ const parseDuration = (duration: string): number => {
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [durationInSeconds, setDurationInSeconds] = useState(parseDuration(duration));
+  
+  // Forçar duração para um valor padrão se for inválido
+  const fixedDuration = duration === 'Infinity:NaN' || 
+                         duration === 'undefined:undefined' || 
+                         duration === 'NaN:NaN' ? 
+                         '0:00' : duration;
+  
+  const [durationInSeconds, setDurationInSeconds] = useState(parseDuration(fixedDuration));
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
@@ -184,9 +191,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, duration = '0:00' }) => 
     ? `${(currentTime / durationInSeconds) * 100}%` 
     : '0%';
   
+  // Garantir que não exibimos "Infinity:NaN" ou valores inválidos
+  const displayDuration = !isNaN(durationInSeconds) && isFinite(durationInSeconds) 
+    ? formatTime(durationInSeconds) 
+    : "0:00";
+    
   return (
     <PlayerContainer>
-      <DurationLabel>{formatTime(durationInSeconds)}</DurationLabel>
+      <DurationLabel>{displayDuration}</DurationLabel>
       
       <ControlsContainer>
         <PlayButton onClick={togglePlayPause}>

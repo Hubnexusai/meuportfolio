@@ -504,11 +504,15 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       // Garantir que a duração é válida para evitar "Infinity:NaN"
       let duration = '0:00';
       if (parts.length > 1 && parts[1]?.includes('duration:')) {
-        const durationPart = parts[1]?.split(':');
-        if (durationPart.length >= 2 && !isNaN(parseInt(durationPart[1]))) {
-          duration = durationPart[1] || '0:00';
+        // Parse mais robusto da duração
+        const durationText = parts[1].replace('duration:', '').trim();
+        // Verificar se é uma duração válida no formato mm:ss
+        if (/^\d+:\d{2}$/.test(durationText) && durationText !== 'Infinity:NaN') {
+          duration = durationText;
         }
       }
+      
+      console.log("Áudio formatado com duração:", duration);
       
       return (
         <AudioContainer>
@@ -818,10 +822,11 @@ const GlobalChatModal: React.FC = () => {
       return;
     }
     
-    // Adiciona mensagem do usuário (áudio) com a duração
+    // Adiciona mensagem do usuário (áudio) - garantir que a duração seja válida
+    const audioTime = formattedTime || '0:00';
     const newUserMessage: Message = {
       id: messageIdCounter.current++,
-      text: `data:audio/webm;base64,${audioBase64}|duration:${formattedTime}`,
+      text: `data:audio/webm;base64,${audioBase64}|duration:${audioTime}`,
       isUser: true,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       createdAt: Date.now(),
