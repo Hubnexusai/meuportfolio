@@ -1110,23 +1110,25 @@ const GlobalChatModal: React.FC = () => {
             disabled={isRecording}
           />
           
-          {/* Botão de gravação/descarte */}
-          <RecordButton 
-            onClick={isRecording ? discardRecording : startRecording}
-            $isRecording={isRecording}
-            title={isRecording ? "Descartar gravação" : "Gravar áudio"}
-          >
-            <i className={isRecording ? "fas fa-trash" : "fas fa-microphone"}></i>
-          </RecordButton>
-          
-          {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
-          <SendButton 
-            onClick={isRecording ? stopRecording : handleSendMessage}
-            disabled={!isRecording && inputValue.trim() === ''}
-            title={isRecording ? "Enviar áudio" : "Enviar mensagem"}
-          >
-            <i className="fas fa-paper-plane"></i>
-          </SendButton>
+          <ButtonsContainer>
+            {/* Botão de gravação/descarte */}
+            <RecordButton 
+              onClick={isRecording ? discardRecording : startRecording}
+              $isRecording={isRecording}
+              title={isRecording ? "Descartar gravação" : "Gravar áudio"}
+            >
+              {isRecording ? "Cancelar" : "Gravar áudio"}
+            </RecordButton>
+            
+            {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
+            <SendButton 
+              onClick={isRecording ? stopRecording : handleSendMessage}
+              disabled={!isRecording && inputValue.trim() === ''}
+              title={isRecording ? "Enviar áudio" : "Enviar mensagem"}
+            >
+              {isRecording ? "Enviar áudio" : "Enviar mensagem"}
+            </SendButton>
+          </ButtonsContainer>
         </InputArea>
       </ModalContainer>
     </ModalOverlay>
