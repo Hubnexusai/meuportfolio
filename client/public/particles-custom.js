@@ -27,15 +27,15 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   
   // Configurações das partículas
-  const particleCount = 12; // Um pouco mais para garantir formação de triângulos
+  const particleCount = 14; // Aumentado para 14 conforme solicitado
   const particles = [];
   
-  // Criar as partículas com velocidade 6x
+  // Criar as partículas com velocidade 6x e tamanho reduzido
   for (let i = 0; i < particleCount; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
-      size: Math.random() * 2 + 1,
+      size: Math.random() * 1.2 + 0.8, // Tamanho reduzido (entre 0.8 e 2.0)
       // Velocidade 6x mais rápida
       speedX: (Math.random() * 0.5 - 0.25) * 6,
       speedY: (Math.random() * 0.5 - 0.25) * 6
