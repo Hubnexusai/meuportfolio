@@ -124,9 +124,9 @@ const ModalOverlay = styled.div<{ $isOpen: boolean }>`
 `;
 
 const ModalContainer = styled.div`
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
+  width: 85%;
+  max-width: 450px;
+  max-height: 75vh;
   background: rgba(22, 27, 58, 0.95);
   border-radius: 1rem;
   overflow: hidden;
@@ -214,8 +214,8 @@ const ChatArea = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  min-height: 300px;
-  max-height: 50vh;
+  min-height: 280px;
+  max-height: 45vh;
   background-image: 
     linear-gradient(rgba(22, 27, 58, 0.95), rgba(22, 27, 58, 0.95)),
     url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50 L70 30 L50 10 L30 30 Z' fill='%2300CCFF' fill-opacity='0.05'/%3E%3C/svg%3E");
