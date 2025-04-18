@@ -233,6 +233,10 @@ const ChatArea = styled.div`
 
 const MessageWrapper = styled.div<{ $isUser: boolean }>`
   align-self: ${props => props.$isUser ? 'flex-end' : 'flex-start'};
+  width: 85%;
+  max-width: 85%;
+  margin-bottom: 1.5rem;
+  position: relative;
   
   &.zoom-in-bounce {
     animation: ${zoomInBounce} 0.4s ease-out;
@@ -240,7 +244,7 @@ const MessageWrapper = styled.div<{ $isUser: boolean }>`
 `;
 
 const BubbleContainer = styled.div<{ $isUser: boolean }>`
-  max-width: 80%;
+  width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 1rem;
   background: ${props => props.$isUser 
@@ -257,8 +261,8 @@ const BubbleContainer = styled.div<{ $isUser: boolean }>`
     height: 0;
     border: 0.5rem solid transparent;
     ${props => props.$isUser 
-      ? 'border-left-color: #00CCFF; right: -0.75rem; top: 50%; transform: translateY(-50%);'
-      : 'border-right-color: rgba(45, 55, 72, 0.7); left: -0.75rem; top: 50%; transform: translateY(-50%);'
+      ? 'border-left-color: #00CCFF; right: -0.75rem; top: 1rem;'
+      : 'border-right-color: rgba(45, 55, 72, 0.7); left: -0.75rem; top: 1rem;'
     }
   }
 `;
@@ -266,13 +270,14 @@ const BubbleContainer = styled.div<{ $isUser: boolean }>`
 const MessageTime = styled.span`
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.7);
-  margin-left: 0.5rem;
-  align-self: flex-end;
+  position: absolute;
+  right: 0;
+  bottom: -1.4rem;
 `;
 
 const InputArea = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   padding: 1rem;
   background: rgba(30, 41, 59, 0.7);
   gap: 0.75rem;
@@ -280,7 +285,7 @@ const InputArea = styled.div`
 `;
 
 const ChatInput = styled.input`
-  flex: 1;
+  width: 100%;
   background: rgba(45, 55, 72, 0.7);
   border: 1px solid rgba(0, 204, 255, 0.3);
   border-radius: 1.5rem;
@@ -303,27 +308,35 @@ const ChatInput = styled.input`
   }
 `;
 
+const ButtonsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+`;
+
 const SendButton = styled.button<{ disabled?: boolean }>`
-  background: linear-gradient(to right, #000935, #00CCFF);
+  background: ${props => props.disabled 
+    ? 'rgba(30, 41, 59, 0.7)' 
+    : 'linear-gradient(to right, #000935, #00CCFF)'};
   border: none;
   color: white;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.875rem;
+  width: 48%;
   
   &:hover:not(:disabled) {
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
   
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: rgba(30, 41, 59, 0.7);
   }
 `;
 
@@ -333,25 +346,19 @@ const RecordButton = styled.button<{ $isRecording: boolean }>`
     : 'linear-gradient(to right, #000935, #00CCFF)'};
   border: none;
   color: white;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 0.875rem;
+  width: 48%;
   
   &:hover {
-    transform: ${props => props.$isRecording ? 'scale(1)' : 'scale(1.1)'};
-  }
-  
-  & > i {
-    transition: transform 0.2s ease;
-  }
-  
-  &:hover > i {
-    transform: ${props => props.$isRecording ? 'rotate(45deg)' : 'none'};
+    transform: scale(1.05);
   }
 `;
 
