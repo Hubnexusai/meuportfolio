@@ -179,13 +179,16 @@ const AgentInfo = styled.div`
 const AgentName = styled.h3`
   margin: 0;
   color: white;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
+  font-family: var(--font-heading);
+  letter-spacing: 0.5px;
 `;
 
 const AgentStatus = styled.p`
   margin: 0;
   color: #a5b4fc;
   font-size: 0.875rem;
+  font-family: var(--font-body);
 `;
 
 const CloseButton = styled.button`
