@@ -378,7 +378,8 @@ interface Message {
   type?: 'audio' | 'image' | 'document' | 'video' | 'text';
 }
 
-// Função auxiliar para processar respostas do webhook em vários formatos
+// Função auxiliar para processar TODAS as respostas do webhook em vários formatos
+// Processa todas as mensagens recebidas, sem ignorar nenhuma
 function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObject<number>): Message[] {
   const messages: Message[] = [];
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -399,7 +400,7 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
   try {
     // Caso 1: Resposta tem um campo 'output' (formato novo)
     if (data && data.output && Array.isArray(data.output)) {
-      // Processa apenas o primeiro item relevante do output
+      // Processa todos os itens relevantes do output
       for (const item of data.output) {
         if (item.message && item.message !== "Workflow was started") {
           const messageType = item.typeMessage?.toLowerCase() || 'text';
@@ -411,13 +412,13 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
             createdAt: Date.now(),
             type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
           });
-          break; // Só processa o primeiro item válido
+          // Removido o break para processar todas as mensagens
         }
       }
     }
     // Caso 2: Resposta é um array 
     else if (Array.isArray(data)) {
-      // Processa apenas o primeiro item relevante do array
+      // Processa todos os itens relevantes do array
       for (const outerItem of data) {
         let messageAdded = false;
         
@@ -435,7 +436,7 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
                 type: messageType as 'text' | 'audio' | 'image' | 'document' | 'video' | undefined
               });
               messageAdded = true;
-              break; // Só processa o primeiro item válido
+              // Removido o break para processar todas as mensagens
             }
           }
         } 
@@ -453,7 +454,7 @@ function processWebhookResponse(data: any, messageIdCounter: React.MutableRefObj
           messageAdded = true;
         }
         
-        if (messageAdded) break; // Se alguma mensagem foi adicionada, não processa mais itens
+        // Removido o break para processar todas as mensagens, mesmo de diferentes itens
       }
     } 
     // Caso 3: Resposta é um objeto com message ou messages
