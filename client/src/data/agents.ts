@@ -8,74 +8,56 @@ export interface Agent {
 export const agents: Agent[] = [
   {
     id: 1,
-    icon: 'fas fa-hospital',
-    title: 'Agente de Clínicas',
-    description: 'Otimize o gerenciamento de pacientes e consultas. Este agente organiza agendamentos, envia lembretes e facilita a comunicação entre equipe médica e pacientes.'
+    icon: 'fas fa-user-md',
+    title: 'Atendente de Clínica',
+    description: 'Otimize o agendamento de consultas e atendimento aos pacientes. Este assistente gerencia horários, confirmações e lembretes, além de fornecer informações sobre exames e procedimentos.'
   },
   {
     id: 2,
-    icon: 'fas fa-shopping-cart',
-    title: 'Agente de Loja',
-    description: 'Melhore a experiência de compra e gestão de produtos. Este agente auxilia na organização de estoque, atendimento ao cliente e automação de processos de venda.'
+    icon: 'fas fa-mobile-alt',
+    title: 'Vendedor de iPhone',
+    description: 'Auxilie clientes na escolha do modelo ideal de iPhone. Este assistente fornece informações técnicas, compara modelos, explica benefícios e ajuda a encontrar o melhor plano ou condição de pagamento.'
   },
   {
     id: 3,
     icon: 'fas fa-home',
-    title: 'Agente de Imobiliária',
-    description: 'Transforme a experiência de compra e venda de imóveis. Este agente gerencia listagens, organiza visitas e qualifica leads para corretores, aumentando a eficiência do negócio.'
+    title: 'Corretor de Imóveis',
+    description: 'Encontre o imóvel perfeito para seus clientes. Este assistente apresenta opções personalizadas, agenda visitas, esclarece dúvidas sobre financiamento e conecta compradores com as melhores oportunidades do mercado.'
   },
   {
     id: 4,
-    icon: 'fas fa-pen-fancy',
-    title: 'Agente de Copywrite',
-    description: 'Potencialize sua estratégia de conteúdo. Este agente auxilia na criação de textos persuasivos, analisa métricas e otimiza a comunicação com seu público-alvo.'
+    icon: 'fas fa-pen-nib',
+    title: 'Copywriter',
+    description: 'Crie textos persuasivos que convertem. Este assistente ajuda a elaborar headlines impactantes, landing pages otimizadas, emails que vendem e conteúdos que geram engajamento para sua marca.'
   },
   {
     id: 5,
-    icon: 'fas fa-briefcase',
-    title: 'Agente de Comercial (SDR)',
-    description: 'Automatize prospecção e qualificação de leads. Este agente gerencia o funil de vendas, agenda reuniões e mantém interações personalizadas com potenciais clientes.'
+    icon: 'fas fa-university',
+    title: 'Secretária Acadêmica',
+    description: 'Gerencie processos acadêmicos com eficiência. Este assistente cuida de matrículas, históricos escolares, agendamento de aulas e fornece informações sobre cursos e procedimentos institucionais.'
   },
   {
     id: 6,
-    icon: 'fas fa-graduation-cap',
-    title: 'Agente de Escola',
-    description: 'Modernize a gestão escolar e comunicação. Este agente organiza cronogramas, facilita a comunicação entre professores, alunos e pais, e ajuda na gestão de tarefas.'
+    icon: 'fas fa-calculator',
+    title: 'Assistente Financeiro',
+    description: 'Organize e otimize suas finanças. Este assistente ajuda no controle de contas a pagar e receber, análise de fluxo de caixa, elaboração de relatórios gerenciais e auxílio em planejamento financeiro.'
   },
   {
     id: 7,
-    icon: 'fas fa-chart-line',
-    title: 'Agente de Financeiro',
-    description: 'Otimize análises financeiras e recomendações. Este agente processa dados, gera insights sobre investimentos e ajuda na gestão orçamentária para decisões estratégicas.'
+    icon: 'fas fa-cut',
+    title: 'Atendente de Barbearia',
+    description: 'Transforme a experiência dos seus clientes. Este assistente gerencia agendamentos, sugere cortes e tratamentos, envia lembretes de horários e ajuda a fidelizar clientes com promoções personalizadas.'
   },
   {
     id: 8,
-    icon: 'fas fa-cut',
-    title: 'Agente de Barbearia',
-    description: 'Simplifique a gestão do seu negócio. Este agente gerencia agendamentos, organiza cadastro de clientes e facilita a comunicação, elevando a experiência do seu estabelecimento.'
+    icon: 'fas fa-motorcycle',
+    title: 'Atendente de Delivery',
+    description: 'Agilize pedidos e entregas com eficiência. Este assistente recebe e confirma pedidos, fornece informações sobre cardápio, acompanha status de entregas e resolve dúvidas sobre produtos e formas de pagamento.'
   },
   {
     id: 9,
-    icon: 'fas fa-spa',
-    title: 'Agente de Salão de Beleza',
-    description: 'Otimize o gerenciamento do seu salão. Este agente cuida de agendamentos, fidelização de clientes e gerenciamento de serviços, melhorando a produtividade do seu negócio.'
-  },
-  {
-    id: 10,
-    icon: 'fas fa-motorcycle',
-    title: 'Agente de Delivery',
-    description: 'Transforme a logística de entregas. Este agente otimiza rotas, gerencia pedidos e melhora a comunicação com clientes, aumentando a eficiência das suas entregas.'
-  },
-  {
-    id: 11,
-    icon: 'fas fa-balance-scale',
-    title: 'Agente para Advocacia',
-    description: 'Aumente a produtividade do escritório jurídico. Este agente organiza casos, pesquisa jurisprudência e facilita a comunicação com clientes e documentação.'
-  },
-  {
-    id: 12,
-    icon: 'fas fa-calendar-check',
-    title: 'Agente para Agendamentos',
-    description: 'Simplifique sua gestão de compromissos. Este agente automatiza marcações, envia lembretes e organiza sua agenda de forma inteligente, otimizando seu tempo.'
+    icon: 'fas fa-gavel',
+    title: 'Secretária Jurídica',
+    description: 'Organize a rotina do escritório de advocacia. Este assistente gerencia documentos, agenda reuniões e audiências, mantém clientes informados sobre andamento de processos e auxilia em pesquisas jurídicas básicas.'
   }
 ];
