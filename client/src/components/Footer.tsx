@@ -163,6 +163,10 @@ const Footer: React.FC = () => {
         <BottomBar>
           <Copyright>
             <span>© {currentYear} Hub Nexus AI. Todos os direitos reservados.</span>
+            <div style={{ margin: '0.7rem 0', display: 'flex', gap: '1.5rem', justifyContent: 'center' }}>
+              <BottomLink href="/privacy-policy">Política de Privacidade</BottomLink>
+              <BottomLink href="/terms-of-service">Termos de Uso</BottomLink>
+            </div>
             <SocialLinks>
               <SocialLink 
                 href="https://www.linkedin.com/in/gustavo-pedrosa-117b8716b/" 
