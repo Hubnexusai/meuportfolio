@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import GlobalChatModal from "./components/GlobalChatModal";
+import FloatingWhatsApp from "./components/FloatingWhatsApp";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router />
       <GlobalChatModal />
+      <FloatingWhatsApp />
       <Toaster />
     </QueryClientProvider>
   );
