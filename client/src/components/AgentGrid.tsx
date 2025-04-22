@@ -64,10 +64,6 @@ const AgentGridContainer = styled.div`
     grid-template-columns: repeat(3, 1fr);
   }
   
-  @media (min-width: 1280px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-  
   & > div {
     height: 100%;
     display: flex;
