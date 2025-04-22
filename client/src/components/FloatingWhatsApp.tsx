@@ -25,7 +25,7 @@ const pulse = keyframes`
 const FloatingContainer = styled.a`
   position: fixed;
   bottom: 30px;
-  left: 30px;
+  right: 30px; /* Alterado para o lado direito */
   z-index: 100;
   width: 60px;
   height: 60px;
@@ -37,6 +37,8 @@ const FloatingContainer = styled.a`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
   transition: all 0.3s ease;
   animation: ${shake} 3s infinite ease-in-out, ${pulse} 2s infinite;
+  border: 4px solid white; /* Borda branca mais espessa */
+  box-sizing: content-box; /* Garante que a borda não reduza o tamanho do ícone */
   
   &:hover {
     transform: scale(1.1);
@@ -49,7 +51,7 @@ const FloatingContainer = styled.a`
     width: 50px;
     height: 50px;
     bottom: 20px;
-    left: 20px;
+    right: 20px; /* Alterado para o lado direito */
   }
   
   &::after {
@@ -69,8 +71,8 @@ const FloatingContainer = styled.a`
 const Tooltip = styled.span`
   position: absolute;
   top: -40px;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
+  transform: translateX(-15%);
   background-color: #000935;
   color: white;
   padding: 8px 12px;
@@ -85,8 +87,7 @@ const Tooltip = styled.span`
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
-    margin-left: -5px;
+    right: 20px;
     border-width: 5px;
     border-style: solid;
     border-color: #000935 transparent transparent transparent;
