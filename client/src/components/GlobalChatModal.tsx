@@ -31,8 +31,15 @@ export class ChatModalManager {
   }
 
   closeModal(): void {
+    // Não alterar o estado imediatamente, apenas disparar um evento para
+    // que o componente possa decidir se deve mostrar o popup ou fechar
+    // O componente chamará finishClose() quando for seguro fechar
+    this.notifyListeners({ action: 'try-close' });
+  }
+  
+  finishClose(): void {
     this.isOpen = false;
-    this.notifyListeners();
+    this.notifyListeners({ action: 'closed' });
   }
 
   getState(): { isOpen: boolean; agentName: string; agentIcon: string } {
@@ -50,8 +57,12 @@ export class ChatModalManager {
     };
   }
 
-  private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.getState()));
+  private notifyListeners(customData?: any): void {
+    const state = this.getState();
+    this.listeners.forEach(listener => listener({
+      ...state,
+      ...customData
+    }));
   }
 }
 
@@ -61,6 +72,7 @@ export function useChatModal() {
     isOpen: boolean;
     agentName: string;
     agentIcon: string;
+    action?: string;
   }>({
     isOpen: false,
     agentName: '',
@@ -85,11 +97,16 @@ export function useChatModal() {
   const closeModal = () => {
     ChatModalManager.getInstance().closeModal();
   };
+  
+  const finishClose = () => {
+    ChatModalManager.getInstance().finishClose();
+  };
 
   return {
     ...state,
     openModal,
-    closeModal
+    closeModal,
+    finishClose
   };
 }
 
@@ -717,7 +734,7 @@ function useAudioRecorder() {
 
 const GlobalChatModal: React.FC = () => {
   const webhookUrl = useWebhookUrl();
-  const { isOpen, agentName, agentIcon, closeModal } = useChatModal();
+  const { isOpen, agentName, agentIcon, action, closeModal, finishClose } = useChatModal();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -778,6 +795,20 @@ const GlobalChatModal: React.FC = () => {
       }
     }
   }, []);
+  
+  // Monitora o evento de "try-close" para decidir se mostra o popup ou fecha o modal
+  useEffect(() => {
+    if (action === 'try-close') {
+      console.log("Tentando fechar o chat...");
+      if (!userInfoCollected) {
+        // Mostrar popup de coleta de informações
+        setShowInfoPopup(true);
+      } else {
+        // Já temos as informações, então podemos fechar definitivamente
+        finishClose();
+      }
+    }
+  }, [action, userInfoCollected, finishClose]);
 
   // Reseta as mensagens quando o modal é aberto
   useEffect(() => {
@@ -858,21 +889,6 @@ const GlobalChatModal: React.FC = () => {
   // Função para enviar áudio
   const handleSendAudio = () => {
     if (!audioBase64) return;
-    
-    // Não permitir envio de áudio até que todas as informações sejam coletadas
-    if (!userInfoCollected) {
-      // Adicione uma mensagem informando que a coleta de dados precisa ser concluída
-      const errorMessage: Message = {
-        id: messageIdCounter.current++,
-        text: 'Por favor, complete suas informações de contato para utilizar o áudio.',
-        isUser: false,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        createdAt: Date.now(),
-        type: 'text'
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      return;
-    }
     
     // Adiciona mensagem do usuário (áudio) - garantir que a duração seja válida
     // Usar a duração final formatada para garantir consistência
@@ -1040,6 +1056,9 @@ const GlobalChatModal: React.FC = () => {
     // Fecha o popup
     setShowInfoPopup(false);
     
+    // Fecha o chat definitivamente
+    finishClose();
+    
     // Envia as informações para o webhook
     const webhookPayload: Record<string, any> = {
       agent: lastChatAgent ? slugifyAgentName(lastChatAgent) : 'agente-desconhecido',
@@ -1161,20 +1180,9 @@ const GlobalChatModal: React.FC = () => {
               <RecordButton 
                 onClick={isRecording ? discardRecording : startRecording}
                 $isRecording={isRecording}
-                disabled={!isRecording && !userInfoCollected}
-                title={isRecording 
-                  ? "Descartar gravação" 
-                  : !userInfoCollected 
-                    ? "Complete seus dados para gravar áudio" 
-                    : "Gravar áudio"
-                }
+                title={isRecording ? "Descartar gravação" : "Gravar áudio"}
               >
                 {isRecording ? "Cancelar" : "Gravar áudio"}
-                {!isRecording && !userInfoCollected && 
-                  <span style={{ fontSize: '0.65rem', display: 'block', marginTop: '0.2rem', opacity: 0.8 }}>
-                    (Complete seus dados)
-                  </span>
-                }
               </RecordButton>
               
               {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
