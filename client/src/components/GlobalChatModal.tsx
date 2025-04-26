@@ -3,6 +3,7 @@ import styled, { keyframes } from 'styled-components';
 import lamejs from 'lamejs';
 import TypingIndicatorComponent from './TypingIndicator';
 import AudioPlayer from './AudioPlayer';
+import ContactInfoPopup from './ContactInfoPopup';
 import { useWebhookUrl } from '../hooks/use-env-config';
 
 // Singleton para gerenciar o estado global do modal
@@ -727,8 +728,12 @@ const GlobalChatModal: React.FC = () => {
   const [userWhatsapp, setUserWhatsapp] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
   
-  // Estado para controlar o fluxo de coleta de informações
-  const [infoCollectionStep, setInfoCollectionStep] = useState<'none' | 'name' | 'whatsapp' | 'email' | 'complete'>('none');
+  // Estado para controlar se as informações já foram coletadas
+  const [userInfoCollected, setUserInfoCollected] = useState<boolean>(false);
+  
+  // Estado para controlar o popup de coleta de informações
+  const [showInfoPopup, setShowInfoPopup] = useState<boolean>(false);
+  const [lastChatAgent, setLastChatAgent] = useState<string>('');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageIdCounter = useRef(2);
@@ -758,6 +763,22 @@ const GlobalChatModal: React.FC = () => {
   // Armazena o ID de sessão para todas as requisições
   const [sessionId] = useState(() => generateSessionId());
   
+  // Verifica se as informações do usuário já foram coletadas (persistente)
+  useEffect(() => {
+    const storedUserInfo = localStorage.getItem('hubnexusai_user_info');
+    if (storedUserInfo) {
+      try {
+        const userInfo = JSON.parse(storedUserInfo);
+        setUserName(userInfo.name || '');
+        setUserWhatsapp(userInfo.whatsapp || '');
+        setUserEmail(userInfo.email || '');
+        setUserInfoCollected(true);
+      } catch (error) {
+        console.error('Erro ao recuperar informações do usuário:', error);
+      }
+    }
+  }, []);
+
   // Reseta as mensagens quando o modal é aberto
   useEffect(() => {
     if (isOpen && agentName) {
@@ -766,16 +787,13 @@ const GlobalChatModal: React.FC = () => {
       messageIdCounter.current = 1;
       setWelcomeMessageShown(false);
       
-      // Reseta as informações do usuário e volta para o primeiro passo de coleta
-      setUserName('');
-      setUserWhatsapp('');
-      setUserEmail('');
-      setInfoCollectionStep('name');
+      // Guarda o nome do agente para usar no popup de coleta de informações
+      setLastChatAgent(agentName);
       
-      // Adiciona uma mensagem de boas-vindas e solicita o nome
+      // Adiciona uma mensagem de boas-vindas
       const welcomeMessage: Message = {
         id: messageIdCounter.current++,
-        text: `Olá, você está no ${agentName}. Por favor, me informe seu nome:`,
+        text: `Olá, você está no ${agentName}. Como posso ajudar?`,
         isUser: false,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         createdAt: Date.now(),
@@ -786,12 +804,19 @@ const GlobalChatModal: React.FC = () => {
       setWelcomeMessageShown(true);
       
       // Iniciar enviando uma mensagem automática para o webhook apenas para notificar abertura
-      const webhookPayload = {
+      const webhookPayload: Record<string, any> = {
         agent: slugifyAgentName(agentName),
         message: "CHAT_OPENED",
         typeMessage: "system",
         sessionId: sessionId
       };
+      
+      // Adicionar informações do usuário se já foram coletadas
+      if (userInfoCollected) {
+        webhookPayload.nome = userName;
+        webhookPayload.whatsapp = userWhatsapp;
+        webhookPayload.email = userEmail;
+      }
       
       // Enviar requisição silenciosa para o webhook (não exibimos a resposta na primeira abertura)
       fetch(webhookUrl, {
@@ -810,7 +835,7 @@ const GlobalChatModal: React.FC = () => {
         console.error('Erro ao notificar abertura de chat:', error);
       });
     }
-  }, [isOpen, agentName, webhookUrl, sessionId]);
+  }, [isOpen, agentName, webhookUrl, sessionId, userInfoCollected, userName, userWhatsapp, userEmail]);
   
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -835,11 +860,11 @@ const GlobalChatModal: React.FC = () => {
     if (!audioBase64) return;
     
     // Não permitir envio de áudio até que todas as informações sejam coletadas
-    if (infoCollectionStep !== 'complete') {
+    if (!userInfoCollected) {
       // Adicione uma mensagem informando que a coleta de dados precisa ser concluída
       const errorMessage: Message = {
         id: messageIdCounter.current++,
-        text: 'Por favor, primeiro forneça as informações solicitadas antes de enviar áudio.',
+        text: 'Por favor, complete suas informações de contato para utilizar o áudio.',
         isUser: false,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         createdAt: Date.now(),
@@ -868,7 +893,7 @@ const GlobalChatModal: React.FC = () => {
     setIsTyping(true);
     
     // Prepara o payload para o webhook com as informações do usuário
-    const webhookPayload = {
+    const webhookPayload: Record<string, any> = {
       agent: slugifyAgentName(agentName),
       message: audioBase64,
       typeMessage: "audio",
@@ -941,132 +966,11 @@ const GlobalChatModal: React.FC = () => {
     
     setMessages(prev => [...prev, newUserMessage]);
     
-    // Processa a coleta de informações do usuário
-    if (infoCollectionStep === 'name') {
-      // Armazena o nome
-      setUserName(inputValue.trim());
-      
-      // Passa para o próximo passo (WhatsApp)
-      setInfoCollectionStep('whatsapp');
-      
-      // Adiciona uma mensagem solicitando o WhatsApp
-      const whatsappRequestMessage: Message = {
-        id: messageIdCounter.current++,
-        text: 'Obrigado! Agora, por favor, me informe seu WhatsApp (com DDD):',
-        isUser: false,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        createdAt: Date.now(),
-        type: 'text'
-      };
-      
-      setTimeout(() => {
-        setMessages(prev => [...prev, whatsappRequestMessage]);
-      }, 500);
-      
-      setInputValue('');
-      return;
-    }
-    
-    if (infoCollectionStep === 'whatsapp') {
-      // Validar o WhatsApp - mínimo de 10 dígitos
-      const whatsappValue = inputValue.trim();
-      const whatsappDigits = whatsappValue.replace(/\D/g, ''); // Remove caracteres não numéricos
-      
-      if (whatsappDigits.length < 10) {
-        // Mensagem de erro para número inválido
-        const errorMessage: Message = {
-          id: messageIdCounter.current++,
-          text: 'O número de WhatsApp precisa ter no mínimo 10 dígitos. Por favor, informe um número válido com DDD:',
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now(),
-          type: 'text'
-        };
-        
-        setMessages(prev => [...prev, errorMessage]);
-        setInputValue('');
-        return;
-      }
-      
-      // Armazena o WhatsApp (validado)
-      setUserWhatsapp(whatsappValue);
-      
-      // Passa para o próximo passo (email)
-      setInfoCollectionStep('email');
-      
-      // Adiciona uma mensagem solicitando o email
-      const emailRequestMessage: Message = {
-        id: messageIdCounter.current++,
-        text: 'Perfeito! Por último, me informe seu e-mail:',
-        isUser: false,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        createdAt: Date.now(),
-        type: 'text'
-      };
-      
-      setTimeout(() => {
-        setMessages(prev => [...prev, emailRequestMessage]);
-      }, 500);
-      
-      setInputValue('');
-      return;
-    }
-    
-    if (infoCollectionStep === 'email') {
-      // Validar o e-mail - deve conter @
-      const emailValue = inputValue.trim();
-      
-      if (!emailValue.includes('@')) {
-        // Mensagem de erro para e-mail inválido
-        const errorMessage: Message = {
-          id: messageIdCounter.current++,
-          text: 'Por favor, informe um e-mail válido contendo "@":',
-          isUser: false,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          createdAt: Date.now(),
-          type: 'text'
-        };
-        
-        setMessages(prev => [...prev, errorMessage]);
-        setInputValue('');
-        return;
-      }
-      
-      // Armazena o email validado
-      setUserEmail(emailValue);
-      
-      // Marca a coleta de informações como concluída
-      setInfoCollectionStep('complete');
-      
-      // Adiciona uma mensagem de informações coletadas
-      const collectionCompleteMessage: Message = {
-        id: messageIdCounter.current++,
-        text: 'Obrigado por fornecer suas informações! Agora podemos prosseguir com a conversa.',
-        isUser: false,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        createdAt: Date.now(),
-        type: 'text'
-      };
-      
-      setTimeout(() => {
-        setMessages(prev => [...prev, collectionCompleteMessage]);
-      }, 500);
-      
-      setInputValue('');
-      return;
-    }
-    
-    // A partir daqui, só executa se já tivermos coletado todas as informações
-    if (infoCollectionStep !== 'complete') {
-      setInputValue('');
-      return;
-    }
-    
     // Ativa o indicador de digitação
     setIsTyping(true);
     
     // Prepara o formato do payload para o webhook com as informações do usuário
-    const webhookPayload = {
+    const webhookPayload: Record<string, any> = {
       agent: slugifyAgentName(agentName),
       message: inputValue,
       typeMessage: "text",
@@ -1118,18 +1022,74 @@ const GlobalChatModal: React.FC = () => {
     setInputValue('');
   };
   
+  // Função para processar as informações do usuário após coletadas pelo popup
+  const handleUserInfoSubmit = (data: { name: string, whatsapp: string, email: string }) => {
+    // Armazena as informações do usuário
+    setUserName(data.name);
+    setUserWhatsapp(data.whatsapp);
+    setUserEmail(data.email);
+    setUserInfoCollected(true);
+    
+    // Salva as informações no localStorage para persistência
+    localStorage.setItem('hubnexusai_user_info', JSON.stringify({
+      name: data.name,
+      whatsapp: data.whatsapp,
+      email: data.email
+    }));
+    
+    // Fecha o popup
+    setShowInfoPopup(false);
+    
+    // Envia as informações para o webhook
+    const webhookPayload = {
+      agent: lastChatAgent ? slugifyAgentName(lastChatAgent) : 'agente-desconhecido',
+      message: "USER_INFO_COLLECTED",
+      typeMessage: "system",
+      sessionId: sessionId,
+      nome: data.name,
+      whatsapp: data.whatsapp,
+      email: data.email
+    };
+    
+    fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookPayload),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Info do usuário enviada:', data);
+    })
+    .catch(error => {
+      console.error('Erro ao enviar informações do usuário:', error);
+    });
+  };
+  
+  // Função para gerenciar o fechamento do modal e mostrar o popup se necessário
+  const handleCloseModal = () => {
+    // Se o usuário ainda não forneceu informações, mostra o popup ao fechar
+    if (!userInfoCollected) {
+      setShowInfoPopup(true);
+    } else {
+      // Caso contrário, apenas fecha o modal
+      closeModal();
+    }
+  };
+  
   // Handlers para fechar o modal
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       console.log("Fechando modal via clique outside");
-      closeModal();
+      handleCloseModal();
     }
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       console.log("Fechando modal via ESC");
-      closeModal();
+      handleCloseModal();
     }
   };
   
@@ -1137,97 +1097,107 @@ const GlobalChatModal: React.FC = () => {
     console.log("Fechando modal via botão X");
     e.preventDefault();
     e.stopPropagation();
-    closeModal();
+    handleCloseModal();
   };
   
   return (
-    <ModalOverlay 
-      $isOpen={isOpen} 
-      onClick={handleOverlayClick} 
-      onKeyDown={handleKeyDown} 
-      className="fade-in"
-    >
-      <ModalContainer className="zoom-in-bounce" onClick={e => e.stopPropagation()}>
-        <ModalHeader>
-          <AgentAvatar>
-            <i className={agentIcon}></i>
-          </AgentAvatar>
-          <AgentInfo>
-            <AgentName>{agentName}</AgentName>
-            <AgentStatus>Online agora</AgentStatus>
-          </AgentInfo>
-          <CloseButton onClick={handleCloseButtonClick}>×</CloseButton>
-        </ModalHeader>
-        
-        <ChatArea>
-          {messages.map(message => (
-            <MessageWrapper 
-              key={`${message.id}-${message.createdAt}`}
-              $isUser={message.isUser}
-              className="zoom-in-bounce"
-            >
-              <BubbleContainer $isUser={message.isUser}>
-                <MessageContent message={message} />
-                <MessageTime>{message.time}</MessageTime>
-              </BubbleContainer>
-            </MessageWrapper>
-          ))}
+    <>
+      <ModalOverlay 
+        $isOpen={isOpen} 
+        onClick={handleOverlayClick} 
+        onKeyDown={handleKeyDown} 
+        className="fade-in"
+      >
+        <ModalContainer className="zoom-in-bounce" onClick={e => e.stopPropagation()}>
+          <ModalHeader>
+            <AgentAvatar>
+              <i className={agentIcon}></i>
+            </AgentAvatar>
+            <AgentInfo>
+              <AgentName>{agentName}</AgentName>
+              <AgentStatus>Online agora</AgentStatus>
+            </AgentInfo>
+            <CloseButton onClick={handleCloseButtonClick}>×</CloseButton>
+          </ModalHeader>
           
-          {/* Indicador de digitação */}
-          {isTyping && <TypingIndicatorComponent />}
-          
-          <div ref={messagesEndRef} />
-        </ChatArea>
-        
-        <InputArea>
-          {isRecording && (
-            <RecordingTime>
-              <span className="recording-blink">●</span> Gravando: {formattedTime}
-            </RecordingTime>
-          )}
-          
-          <ChatInput
-            type="text"
-            placeholder={isRecording ? "Gravando áudio..." : "Digite sua mensagem..."}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            disabled={isRecording}
-          />
-          
-          <ButtonsContainer>
-            {/* Botão de gravação/descarte */}
-            <RecordButton 
-              onClick={isRecording ? discardRecording : startRecording}
-              $isRecording={isRecording}
-              disabled={!isRecording && infoCollectionStep !== 'complete'}
-              title={isRecording 
-                ? "Descartar gravação" 
-                : infoCollectionStep !== 'complete' 
-                  ? "Complete seus dados para gravar áudio" 
-                  : "Gravar áudio"
-              }
-            >
-              {isRecording ? "Cancelar" : "Gravar áudio"}
-              {!isRecording && infoCollectionStep !== 'complete' && 
-                <span style={{ fontSize: '0.65rem', display: 'block', marginTop: '0.2rem', opacity: 0.8 }}>
-                  (Complete seus dados)
-                </span>
-              }
-            </RecordButton>
+          <ChatArea>
+            {messages.map(message => (
+              <MessageWrapper 
+                key={`${message.id}-${message.createdAt}`}
+                $isUser={message.isUser}
+                className="zoom-in-bounce"
+              >
+                <BubbleContainer $isUser={message.isUser}>
+                  <MessageContent message={message} />
+                  <MessageTime>{message.time}</MessageTime>
+                </BubbleContainer>
+              </MessageWrapper>
+            ))}
             
-            {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
-            <SendButton 
-              onClick={isRecording ? stopRecording : handleSendMessage}
-              disabled={!isRecording && inputValue.trim() === ''}
-              title={isRecording ? "Enviar áudio" : "Enviar mensagem"}
-            >
-              {isRecording ? "Enviar áudio" : "Enviar mensagem"}
-            </SendButton>
-          </ButtonsContainer>
-        </InputArea>
-      </ModalContainer>
-    </ModalOverlay>
+            {/* Indicador de digitação */}
+            {isTyping && <TypingIndicatorComponent />}
+            
+            <div ref={messagesEndRef} />
+          </ChatArea>
+          
+          <InputArea>
+            {isRecording && (
+              <RecordingTime>
+                <span className="recording-blink">●</span> Gravando: {formattedTime}
+              </RecordingTime>
+            )}
+            
+            <ChatInput
+              type="text"
+              placeholder={isRecording ? "Gravando áudio..." : "Digite sua mensagem..."}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              disabled={isRecording}
+            />
+            
+            <ButtonsContainer>
+              {/* Botão de gravação/descarte */}
+              <RecordButton 
+                onClick={isRecording ? discardRecording : startRecording}
+                $isRecording={isRecording}
+                disabled={!isRecording && !userInfoCollected}
+                title={isRecording 
+                  ? "Descartar gravação" 
+                  : !userInfoCollected 
+                    ? "Complete seus dados para gravar áudio" 
+                    : "Gravar áudio"
+                }
+              >
+                {isRecording ? "Cancelar" : "Gravar áudio"}
+                {!isRecording && !userInfoCollected && 
+                  <span style={{ fontSize: '0.65rem', display: 'block', marginTop: '0.2rem', opacity: 0.8 }}>
+                    (Complete seus dados)
+                  </span>
+                }
+              </RecordButton>
+              
+              {/* Botão de envio - agora também interrompe e envia o áudio se estiver gravando */}
+              <SendButton 
+                onClick={isRecording ? stopRecording : handleSendMessage}
+                disabled={!isRecording && inputValue.trim() === ''}
+                title={isRecording ? "Enviar áudio" : "Enviar mensagem"}
+              >
+                {isRecording ? "Enviar áudio" : "Enviar mensagem"}
+              </SendButton>
+            </ButtonsContainer>
+          </InputArea>
+        </ModalContainer>
+      </ModalOverlay>
+      
+      {/* Popup de coleta de informações */}
+      {showInfoPopup && (
+        <ContactInfoPopup 
+          agentName={lastChatAgent}
+          onSubmit={handleUserInfoSubmit}
+        />
+      )}
+    </>
   );
 };
 
