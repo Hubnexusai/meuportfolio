@@ -1041,7 +1041,7 @@ const GlobalChatModal: React.FC = () => {
     setShowInfoPopup(false);
     
     // Envia as informações para o webhook
-    const webhookPayload = {
+    const webhookPayload: Record<string, any> = {
       agent: lastChatAgent ? slugifyAgentName(lastChatAgent) : 'agente-desconhecido',
       message: "USER_INFO_COLLECTED",
       typeMessage: "system",
