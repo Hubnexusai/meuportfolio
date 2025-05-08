@@ -37,12 +37,6 @@ export const agents: Agent[] = [
     description: 'Gerencie processos acadêmicos com eficiência. Este assistente cuida de matrículas, históricos escolares, agendamento de aulas e fornece informações sobre cursos e procedimentos institucionais.'
   },
   {
-    id: 6,
-    icon: 'fas fa-calculator',
-    title: 'Assistente Financeiro',
-    description: 'Organize e otimize suas finanças. Este assistente ajuda no controle de contas a pagar e receber, análise de fluxo de caixa, elaboração de relatórios gerenciais e auxílio em planejamento financeiro.'
-  },
-  {
     id: 7,
     icon: 'fas fa-cut',
     title: 'Atendente de Barbearia',
